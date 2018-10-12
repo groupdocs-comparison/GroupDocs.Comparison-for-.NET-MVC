@@ -185,6 +185,7 @@
     <Content Include="Resources\common\css\swiper.min.css" />
     <Content Include="Resources\common\fonts\fontawesome-webfont.svg" />
     <Content Include="Resources\common\images\banner.png" />
+    <Content Include="Resources\common\js\es6-promise.auto.js" />
     <Content Include="Resources\common\js\jquery-ui.min.js" />
     <Content Include="Resources\common\js\jquery.initialize.min.js" />
     <Content Include="Resources\common\js\jquery.min.js" />
@@ -211,7 +212,9 @@
     <Content Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
-    <Content Include="Views\Web.config" />
+    <Content Include="Views\Web.config">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
