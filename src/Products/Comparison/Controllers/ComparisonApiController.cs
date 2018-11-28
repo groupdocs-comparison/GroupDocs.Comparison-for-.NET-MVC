@@ -43,7 +43,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
         /// <param name="postedData">Post data</param>
         /// <returns>List of files and directories</returns>
         [HttpPost]
-        [Route("comparison/loadFileTree")]
+        [Route("loadFileTree")]
         public HttpResponseMessage loadFileTree(PostedDataEntity fileTreeRequest)
         {
             return Request.CreateResponse(HttpStatusCode.OK, comparisonService.LoadFiles(fileTreeRequest));
@@ -54,7 +54,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
         /// </summary>
         /// <param name=""></param>
         [HttpGet]
-        [Route("comparison/downloadDocument")]
+        [Route("downloadDocument")]
         public HttpResponseMessage DownloadDocument(string guid, string ext, string index = "")
         {
             ext = (ext.Contains(".")) ? ext : "." + ext;
@@ -81,7 +81,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
         /// <param name=""></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("comparison/uploadDocument")]
+        [Route("uploadDocument")]
         public HttpResponseMessage UploadDocument()
         {
             try
@@ -151,7 +151,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
         /// <param name="compareRequest"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("comparison/compareWithPaths")]
+        [Route("compareWithPaths")]
         public HttpResponseMessage CompareWithPaths(CompareRequest compareRequest)
         {
             try
@@ -179,7 +179,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
         /// <param name=""></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("comparison/compareFiles")]
+        [Route("compareFiles")]
         public HttpResponseMessage CompareFiles()
         {
             try
@@ -213,7 +213,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
         /// <param name="compareRequest"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("comparison/compareWithUrls")]
+        [Route("compareWithUrls")]
         public HttpResponseMessage CompareWithUrls(CompareRequest compareRequest)
         {
             try
@@ -256,7 +256,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
         /// <param name="loadResultPageRequest"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("comparison/loadResultPage")]
+        [Route("loadResultPage")]
         public HttpResponseMessage LoadResultPage(PostedDataEntity loadResultPageRequest)
         {
             return Request.CreateResponse(HttpStatusCode.OK, comparisonService.LoadResultPage(loadResultPageRequest));
@@ -268,7 +268,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
         /// <param name=""></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("comparison/compare")]
+        [Route("compare")]
         public HttpResponseMessage Compare()
         {
             try
@@ -306,7 +306,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
         /// <param name=""></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("comparison/multiCompare")]
+        [Route("multiCompare")]
         public HttpResponseMessage MultiCompare()
         {
             try
