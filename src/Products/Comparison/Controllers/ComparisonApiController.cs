@@ -17,7 +17,7 @@ using System.Web.Http.Cors;
 namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
 {
     /// <summary>
-    /// ComparisonApiController
+    /// SignatureApiController
     /// </summary>
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class ComparisonApiController : ApiController

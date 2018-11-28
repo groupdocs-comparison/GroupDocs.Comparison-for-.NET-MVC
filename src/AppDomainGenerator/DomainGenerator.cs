@@ -17,11 +17,11 @@ namespace GroupDocs.Comparison.MVC.AppDomainGenerator
         /// </summary>
         public DomainGenerator(string assemblyName, string className)
         {
-            globalConfiguration = new Products.Common.Config.GlobalConfiguration();           
+            globalConfiguration = new Products.Common.Config.GlobalConfiguration();
             // Get assembly path
             string assemblyPath = this.GetAssemblyPath(assemblyName);
             // Initiate GroupDocs license class
-            CurrentType = this.CreateDomain(assemblyName + "Domain", assemblyPath, className);            
+            CurrentType = this.CreateDomain(assemblyName + "Domain", assemblyPath, className);
         }
 
         /// <summary>
@@ -69,7 +69,15 @@ namespace GroupDocs.Comparison.MVC.AppDomainGenerator
             // Initiate license class
             var obj = (GroupDocs.Comparison.Common.License.License)Activator.CreateInstance(type);
             // Set license
-            obj.SetLicense(globalConfiguration.Application.LicensePath);
+            SetLicense(obj);
+        }
+
+        private void SetLicense(dynamic obj)
+        {
+            if (!String.IsNullOrEmpty(globalConfiguration.Application.LicensePath))
+            {
+                obj.SetLicense(globalConfiguration.Application.LicensePath);
+            }
         }
     }
 }

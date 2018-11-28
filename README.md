@@ -1,5 +1,5 @@
 # GroupDocs.Comparison for .NET MVC Example
-###### version 1.4.0
+###### version 1.5.0
 
 
 ## System Requirements
@@ -43,10 +43,9 @@ Coming soon
 2. Extract/Copy GroupDocs.Comparison for .NET MVC Sample to working directory.
 3. Navigate to GroupDocs.Comparison for .NET MVC Sample root directory.
 4. Open solution in the VisualStudio.
-5. Update parameters in `web.config` to meet your requirements.
+5. Update common parameters in `web.config` and example related properties in the 'configuration.yml' to meet your requirements.
 6. Go to `http://localhost:{PORT}/`.
 PORT - port number specified in `web.config` (by default http://localhost:8080).
-
 
 ## Resources
 - **Website:** [www.groupdocs.com](http://www.groupdocs.com)

@@ -9,17 +9,17 @@ namespace GroupDocs.Comparison.MVC.Products.Common.Config
     {
         public ServerConfiguration Server;
         public ApplicationConfiguration Application;
-        public CommonConfiguration Common;       
+        public CommonConfiguration Common;
         public ComparisonConfiguration Comparison;
 
         /// <summary>
         /// Get all configurations
         /// </summary>
         public GlobalConfiguration()
-        {
+        {            
             Server = new ServerConfiguration();
-            Application = new ApplicationConfiguration();          
-            Common = new CommonConfiguration();          
+            Application = new ApplicationConfiguration();            
+            Common = new CommonConfiguration();            
             Comparison = new ComparisonConfiguration();
         }
     }
