@@ -18,8 +18,8 @@ namespace GroupDocs.Comparison.MVC.Products.Common.Config
         public GlobalConfiguration()
         {            
             Server = new ServerConfiguration();
-            Application = new ApplicationConfiguration();            
-            Common = new CommonConfiguration();            
+            Application = new ApplicationConfiguration();
+            Common = new CommonConfiguration();
             Comparison = new ComparisonConfiguration();
         }
     }

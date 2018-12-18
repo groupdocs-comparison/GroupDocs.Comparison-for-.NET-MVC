@@ -16,7 +16,7 @@ namespace GroupDocs.Comparison.MVC.Products.Common.Resources
         /// <param name="directory">Directory where to search files</param>
         /// <param name="fileName">Uploaded file name</param>
         /// <returns></returns>
-        public string GetFreeFileName(string directory, string fileName)
+        public static string GetFreeFileName(string directory, string fileName)
         {
             string resultFileName = "";
             try
