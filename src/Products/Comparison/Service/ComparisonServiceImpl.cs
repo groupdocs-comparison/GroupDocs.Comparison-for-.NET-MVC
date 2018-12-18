@@ -18,16 +18,16 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
 {
     public class ComparisonServiceImpl : IComparisonService
     {
-        public static string COMPARE_RESULT = "compareResult";
-        public static string JPG = ".jpg";
-        public static string DOCX = ".docx";
-        public static string DOC = ".doc";
-        public static string XLS = ".xls";
-        public static string XLSX = ".xlsx";
-        public static string PPT = ".ppt";
-        public static string PPTX = ".pptx";
-        public static string PDF = ".pdf";
-        public static string TXT = ".txt";
+        public static readonly string COMPARE_RESULT = "compareResult";
+        public static readonly string JPG = ".jpg";
+        public static readonly string DOCX = ".docx";
+        public static readonly string DOC = ".doc";
+        public static readonly string XLS = ".xls";
+        public static readonly string XLSX = ".xlsx";
+        public static readonly string PPT = ".ppt";
+        public static readonly string PPTX = ".pptx";
+        public static readonly string PDF = ".pdf";
+        public static readonly string TXT = ".txt";
 
         private GlobalConfiguration globalConfiguration;
 

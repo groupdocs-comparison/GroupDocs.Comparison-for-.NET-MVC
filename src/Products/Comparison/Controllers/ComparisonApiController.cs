@@ -55,7 +55,33 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
         /// <param name=""></param>
         [HttpGet]
         [Route("downloadDocument")]
-        public HttpResponseMessage DownloadDocument(string guid, string ext, string index = "")
+        public HttpResponseMessage DownloadDocument(string guid, string ext)
+        {
+            ext = (ext.Contains(".")) ? ext : "." + ext;
+            string filePath = comparisonService.CalculateResultFileName(guid, "", ext);
+            if (!string.IsNullOrEmpty(filePath))
+            {
+                if (File.Exists(filePath))
+                {
+                    HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
+                    var fileStream = new FileStream(filePath, FileMode.Open);
+                    response.Content = new StreamContent(fileStream);
+                    response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+                    response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment");
+                    response.Content.Headers.ContentDisposition.FileName = System.IO.Path.GetFileName(filePath);
+                    return response;
+                }
+            }
+            return new HttpResponseMessage(HttpStatusCode.NotFound);
+        }
+
+        /// <summary>
+        /// Download results
+        /// </summary>
+        /// <param name=""></param>
+        [HttpGet]
+        [Route("downloadDocument")]
+        public HttpResponseMessage DownloadDocument(string guid, string ext, string index)
         {
             ext = (ext.Contains(".")) ? ext : "." + ext;
             string filePath = comparisonService.CalculateResultFileName(guid, index, ext);
@@ -106,7 +132,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
                             }
                             else
                             {
-                                fileSavePath = new Resources().GetFreeFileName(documentStoragePath, httpPostedFile.FileName);
+                                fileSavePath = Resources.GetFreeFileName(documentStoragePath, httpPostedFile.FileName);
                             }
 
                             // Save the uploaded file to "UploadedFiles" folder
@@ -128,7 +154,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
                         }
                         else
                         {
-                            fileSavePath = new Resources().GetFreeFileName(documentStoragePath, fileName);
+                            fileSavePath = Resources.GetFreeFileName(documentStoragePath, fileName);
                         }
                         // Download the Web resource and save it into the current filesystem folder.
                         client.DownloadFile(url, fileSavePath);
