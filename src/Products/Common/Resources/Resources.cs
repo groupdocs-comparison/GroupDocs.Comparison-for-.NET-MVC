@@ -39,7 +39,7 @@ namespace GroupDocs.Comparison.MVC.Products.Common.Resources
                     }
                 }
             }
-            catch (Exception e)
+            catch (System.Exception e)
             {
                 throw e;
             }
@@ -51,7 +51,7 @@ namespace GroupDocs.Comparison.MVC.Products.Common.Resources
         /// </summary>
         /// <param name="ex">Exception</param>
         /// <returns>ExceptionEntity</returns>
-        public ExceptionEntity GenerateException(Exception ex)
+        public ExceptionEntity GenerateException(System.Exception ex)
         {
             // Initiate Exception entity
             ExceptionEntity exceptionEntity = new ExceptionEntity();
@@ -67,7 +67,7 @@ namespace GroupDocs.Comparison.MVC.Products.Common.Resources
         /// <param name="ex">Exception</param>
         /// <param name="password">string</param>
         /// <returns>ExceptionEntity</returns>
-        public ExceptionEntity GenerateException(Exception ex, String password)
+        public ExceptionEntity GenerateException(System.Exception ex, String password)
         {
             // Initiate exception
             ExceptionEntity exceptionEntity = new ExceptionEntity();

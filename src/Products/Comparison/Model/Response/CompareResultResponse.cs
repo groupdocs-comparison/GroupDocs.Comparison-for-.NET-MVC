@@ -1,4 +1,5 @@
 ﻿using GroupDocs.Comparison.Common.Changes;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace GroupDocs.Comparison.MVC.Products.Comparison.Model.Response
@@ -8,21 +9,70 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Model.Response
         /// <summary>
         /// List of changies
         /// </summary>
-        public ChangeInfo[] changes;
+        [JsonProperty]
+        private ChangeInfo[] changes;
 
         /// <summary>
         /// List of images of pages with marked changes
         /// </summary>
-        public List<string> pages;
+        [JsonProperty]
+        private List<string> pages;
 
         /// <summary>
         /// Unique key of results
         /// </summary>
-        public string guid;
+        [JsonProperty]
+        private string guid;
 
         /// <summary>
         /// Extension of compared files, for saving Comparison results
         /// </summary>
-        public string extension;
+        [JsonProperty]
+        private string extension;
+
+        public void SetChanges(ChangeInfo[] changes)
+        {
+            this.changes = changes;
+        }
+
+        public ChangeInfo[] GetChanges()
+        {
+            return changes;
+        }
+
+        public void SetPages(List<string> pages)
+        {
+            this.pages = pages;
+        }
+
+        public void AddPage(string page)
+        {
+            this.pages.Add(page);
+        }
+
+        public List<string> GetPages()
+        {
+            return pages;
+        }
+
+        public void SetGuid(string guid)
+        {
+            this.guid = guid;
+        }
+
+        public string GetGuid()
+        {
+            return guid;
+        }
+
+        public void SetExtension(string extension)
+        {
+            this.extension = extension;
+        }
+
+        public string GetExtension()
+        {
+            return extension;
+        }
     }
 }

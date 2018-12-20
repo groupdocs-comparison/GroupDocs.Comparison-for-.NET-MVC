@@ -18,16 +18,16 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
 {
     public class ComparisonServiceImpl : IComparisonService
     {
-        public static readonly string COMPARE_RESULT = "compareResult";
-        public static readonly string JPG = ".jpg";
-        public static readonly string DOCX = ".docx";
-        public static readonly string DOC = ".doc";
-        public static readonly string XLS = ".xls";
-        public static readonly string XLSX = ".xlsx";
-        public static readonly string PPT = ".ppt";
-        public static readonly string PPTX = ".pptx";
-        public static readonly string PDF = ".pdf";
-        public static readonly string TXT = ".txt";
+        private static readonly string COMPARE_RESULT = "compareResult";
+        private static readonly string JPG = ".jpg";
+        private static readonly string DOCX = ".docx";
+        private static readonly string DOC = ".doc";
+        private static readonly string XLS = ".xls";
+        private static readonly string XLSX = ".xlsx";
+        private static readonly string PPT = ".ppt";
+        private static readonly string PPTX = ".pptx";
+        private static readonly string PDF = ".pdf";
+        private static readonly string TXT = ".txt";
 
         private GlobalConfiguration globalConfiguration;
 
@@ -65,7 +65,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
                                         List<CompareFileDataRequest> items = result.ToObject<List<CompareFileDataRequest>>();
                                         if (items[0] != null)
                                         {
-                                            if (items[0].file.Contains("http") || items[0].file.Contains("https"))
+                                            if (items[0].GetFile().Contains("http") || items[0].GetFile().Contains("https"))
                                             {
                                                 resultData.urls = items;
                                             }
@@ -110,8 +110,8 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
         public string CalculateResultFileName(string documentGuid, string index, string ext)
         {
             // configure file name for results
-            string directory = globalConfiguration.Comparison.ResultDirectory;
-            string resultDirectory = String.IsNullOrEmpty(directory) ? globalConfiguration.Comparison.FilesDirectory : directory;
+            string directory = globalConfiguration.Comparison.GetResultDirectory();
+            string resultDirectory = String.IsNullOrEmpty(directory) ? globalConfiguration.Comparison.GetFilesDirectory() : directory;
             if (!Directory.Exists(resultDirectory))
             {
                 Directory.CreateDirectory(resultDirectory);
@@ -175,9 +175,9 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
 
             //save all results in file
             string extension = Path.GetExtension(firstPath);
-            SaveFile(compareResultResponse.guid, null, compareResult.GetStream(), extension);
+            SaveFile(compareResultResponse.GetGuid(), null, compareResult.GetStream(), extension);
 
-            compareResultResponse.extension = extension;
+            compareResultResponse.SetExtension(extension);
 
             return compareResultResponse;
         }
@@ -206,9 +206,9 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
             CompareResultResponse compareResultResponse = GetCompareResultResponse(compareResult);
 
             //save all results in file
-            SaveFile(compareResultResponse.guid, null, compareResult.GetStream(), fileExt);
+            SaveFile(compareResultResponse.GetGuid(), null, compareResult.GetStream(), fileExt);
 
-            compareResultResponse.extension = fileExt;
+            compareResultResponse.SetExtension(fileExt);
 
             return compareResultResponse;
         }
@@ -223,11 +223,11 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
                 // get all the files from a directory
                 if (string.IsNullOrEmpty(relDirPath))
                 {
-                    relDirPath = globalConfiguration.Comparison.FilesDirectory;
+                    relDirPath = globalConfiguration.Comparison.GetFilesDirectory();
                 }
                 else
                 {
-                    relDirPath = Path.Combine(globalConfiguration.Comparison.FilesDirectory, relDirPath);
+                    relDirPath = Path.Combine(globalConfiguration.Comparison.GetFilesDirectory(), relDirPath);
                 }
 
                 List<string> allFiles = new List<string>(Directory.GetFiles(relDirPath));
@@ -241,7 +241,8 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
                 {
                     FileInfo fileInfo = new FileInfo(file);
                     // check if current file/folder is hidden
-                    if (fileInfo.Attributes.HasFlag(FileAttributes.Hidden) || Path.GetFileName(file).Equals(Path.GetFileName(globalConfiguration.Comparison.FilesDirectory)))
+                    if (fileInfo.Attributes.HasFlag(FileAttributes.Hidden) || 
+                        Path.GetFileName(file).Equals(Path.GetFileName(globalConfiguration.Comparison.GetFilesDirectory())))
                     {
                         // ignore current file and skip to next one
                         continue;
@@ -327,9 +328,9 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
             CompareResultResponse compareResultResponse = GetCompareResultResponse(compareResult);
 
             //save all results in file
-            SaveFile(compareResultResponse.guid, null, compareResult.GetStream(), ext);
+            SaveFile(compareResultResponse.GetGuid(), null, compareResult.GetStream(), ext);
 
-            compareResultResponse.extension = ext;
+            compareResultResponse.SetExtension(ext);
 
             return compareResultResponse;
         }
@@ -340,10 +341,10 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
 
             // list of changes
             ChangeInfo[] changes = compareResult.GetChanges();
-            compareResultResponse.changes = changes;
+            compareResultResponse.SetChanges(changes);
 
             string guid = System.Guid.NewGuid().ToString();
-            compareResultResponse.guid = guid;
+            compareResultResponse.SetGuid(guid);
 
             // if there are changes save images of all pages
             // unless save only the last page with summary
@@ -351,14 +352,14 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
             {
                 List<string> pages = SaveImages(compareResult.GetImages(), guid);
                 // save all pages
-                compareResultResponse.pages = pages;
+                compareResultResponse.SetPages(pages);
             }
             else
             {
                 Stream[] images = compareResult.GetImages();
                 int last = images.Length - 1;
                 // save only summary page
-                compareResultResponse.pages.Add(SaveFile(guid, last.ToString(), images[last], JPG));
+                compareResultResponse.AddPage(SaveFile(guid, last.ToString(), images[last], JPG));
             }
             return compareResultResponse;
         }
@@ -401,14 +402,21 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
             switch (ext)
             {
                 case ".doc":
+                    return DOC;
                 case ".docx":
                     return DOCX;
                 case ".xls":
+                    return XLS;
                 case ".xlsx":
                     return XLSX;
                 case ".ppt":
+                    return PPT;
                 case ".pptx":
                     return PPTX;
+                case ".pdf":
+                    return PDF;
+                case ".txt":
+                    return TXT;
                 default:
                     return ext;
             }

@@ -14,7 +14,7 @@ namespace GroupDocs.Comparison.MVC
             string comparisonAssemblyName = "GroupDocs.Comparison.dll";           
             // set GroupDocs.Comparison license
             DomainGenerator comparisonDomainGenerator = new DomainGenerator(comparisonAssemblyName, "GroupDocs.Comparison.Common.License.License");
-            comparisonDomainGenerator.SetComparisonLicense(comparisonDomainGenerator.CurrentType);
+            comparisonDomainGenerator.SetComparisonLicense();
 
             AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);

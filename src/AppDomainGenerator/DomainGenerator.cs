@@ -9,8 +9,8 @@ namespace GroupDocs.Comparison.MVC.AppDomainGenerator
     /// </summary>
     public class DomainGenerator
     {
-        private Products.Common.Config.GlobalConfiguration globalConfiguration;
-        public Type CurrentType;
+        private readonly Products.Common.Config.GlobalConfiguration globalConfiguration;
+        private readonly Type CurrentType;
 
         /// <summary>
         /// Constructor
@@ -52,28 +52,27 @@ namespace GroupDocs.Comparison.MVC.AppDomainGenerator
         {
             // Create domain
             AppDomain dom = AppDomain.CreateDomain(domainName);
-            AssemblyName assemblyName = new AssemblyName() { CodeBase = assemblyPath };
+            AssemblyName assemblyName = new AssemblyName { CodeBase = assemblyPath };
             // Load assembly into the domain
             Assembly assembly = dom.Load(assemblyName);
             // Initiate class from the loaded assembly
             Type type = assembly.GetType(className);
             return type;
-        }        
+        }       
 
         /// <summary>
         /// Set GroupDocs.Comparison license
         /// </summary>
         /// <param name="type">Type</param>
-        public void SetComparisonLicense(Type type)
+        public void SetComparisonLicense()
         {
             // Initiate license class
-            var obj = (GroupDocs.Comparison.Common.License.License)Activator.CreateInstance(type);
+            var obj = (GroupDocs.Comparison.Common.License.License)Activator.CreateInstance(CurrentType);
             // Set license
             SetLicense(obj);
         }
 
-        private void SetLicense(dynamic obj)
-        {
+        private void SetLicense(dynamic obj) {
             if (!String.IsNullOrEmpty(globalConfiguration.Application.LicensePath))
             {
                 obj.SetLicense(globalConfiguration.Application.LicensePath);

@@ -24,13 +24,13 @@
     <div id="element"></div>
     <script type="text/javascript">
         $('#element').comparison({
-            applicationPath: 'http://@config.Server.HostAddress:@config.Server.HttpPort/comparison',
+            applicationPath: 'http://@config.Server.HostAddress:@config.Server.HttpPort/comparison/',
             download: @config.Common.isDownload.ToString().ToLowerInvariant(),
             upload: @config.Common.isUpload.ToString().ToLowerInvariant(),
             print: @config.Common.isPrint.ToString().ToLowerInvariant(),
             rewrite: @config.Common.isRewrite.ToString().ToLowerInvariant(),
             preloadResultPageCount: 2,
-            multiComparing: @config.Comparison.isMultiComparing.ToString().ToLowerInvariant(),
+            multiComparing: @config.Comparison.GetIsMultiComparing().ToString().ToLowerInvariant(),
         });
     </script>
 </body>
