@@ -1,21 +1,33 @@
-﻿
-using GroupDocs.Comparison.MVC.Products.Comparison.Model.Request;
+﻿using GroupDocs.Comparison.MVC.Products.Comparison.Model.Request;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Web;
 
 namespace GroupDocs.Comparison.MVC.Products.Comparison.Util
 {
     public class TransformFiles
     {
-        public List<Stream> files;
-        public List<string> passwords;
-        public List<CompareFileDataRequest> urls;
-        public List<CompareFileDataRequest> paths;
-        public List<Stream> newFiles;
-        public List<string> fileNames;
-        public List<string> newPasswords;
+        private readonly List<Stream> files;
+        private readonly List<string> passwords;
+        private readonly List<CompareFileDataRequest> urls;
+        private readonly List<CompareFileDataRequest> paths;
+        private List<Stream> newFiles;
+        private List<string> fileNames;
+        private List<string> newPasswords;
+
+        public List<Stream> GetNewFiles() {
+            return newFiles;
+        }
+
+        public List<string> GetFileNames()
+        {
+            return fileNames;
+        }
+
+        public List<string> GetNewPasswords()
+        {
+            return newPasswords;
+        }
 
         public TransformFiles(List<Stream> files, List<string> passwords, List<CompareFileDataRequest> urls, List<CompareFileDataRequest> paths)
         {
@@ -45,13 +57,13 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Util
             {
                 foreach (CompareFileDataRequest url in urls)
                 {
-                    fileNames.Add(url.file);
+                    fileNames.Add(url.GetFile());
                     using (WebClient client = new WebClient())
                     {
-                        byte[] file = client.DownloadData(url.file);
+                        byte[] file = client.DownloadData(url.GetFile());
                         newFiles.Add(new MemoryStream(file));
                     };
-                    newPasswords.Add(url.password);
+                    newPasswords.Add(url.GetPassword());
                 }
             }
             if (paths != null)
@@ -59,15 +71,15 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Util
                 // transform paths
                 foreach (CompareFileDataRequest pathRequest in paths)
                 {
-                    fileNames.Add(pathRequest.file);
+                    fileNames.Add(pathRequest.GetFile());
                     MemoryStream file = new MemoryStream();
-                    using (Stream stream = File.Open(pathRequest.file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                    using (Stream stream = File.Open(pathRequest.GetFile(), FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                     {
                         stream.CopyTo(file);
                         file.Position = 0;
                         newFiles.Add(file);
                     }
-                    newPasswords.Add(pathRequest.password);
+                    newPasswords.Add(pathRequest.GetPassword());
                 }
             }
             return this;

@@ -8,6 +8,6 @@ namespace GroupDocs.Comparison.MVC.Products.Common.Entity.Web
     public class ExceptionEntity
     {
         public string message { get; set; }
-        public Exception exception { get; set; }
+        public System.Exception exception { get; set; }
     }
 }

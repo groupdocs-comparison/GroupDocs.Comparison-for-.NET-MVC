@@ -11,10 +11,10 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Config
     /// </summary>
     public class ComparisonConfiguration
     {
-        public string FilesDirectory = "DocumentSamples/Comparison";
-        public string ResultDirectory = "DocumentSamples/Comparison/Compared";
-        public int PreloadResultPageCount = 0;
-        public bool isMultiComparing = true;      
+        private string FilesDirectory = "DocumentSamples/Comparison";
+        private string ResultDirectory = "DocumentSamples/Comparison/Compared";
+        private int PreloadResultPageCount = 0;
+        private bool isMultiComparing = true;      
 
         /// <summary>
         /// Constructor
@@ -53,6 +53,46 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Config
                 && path.IndexOfAny(System.IO.Path.GetInvalidPathChars().ToArray()) == -1
                 && Path.IsPathRooted(path)
                 && !Path.GetPathRoot(path).Equals(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal);
+        }
+
+        public void SetFilesDirectory(string filesDirectory)
+        {
+            this.FilesDirectory = filesDirectory;
+        }
+
+        public string GetFilesDirectory()
+        {
+            return FilesDirectory;
+        }
+
+        public void SetResultDirectory(string resultDirectory)
+        {
+            this.ResultDirectory = resultDirectory;
+        }
+
+        public string GetResultDirectory()
+        {
+            return ResultDirectory;
+        }
+
+        public void SetPreloadResultPageCounty(int preloadResultPageCount)
+        {
+            this.PreloadResultPageCount = preloadResultPageCount;
+        }
+
+        public int GetPreloadResultPageCount()
+        {
+            return PreloadResultPageCount;
+        }
+
+        public void SetIsMultiComparing(bool isMultiComparing)
+        {
+            this.isMultiComparing = isMultiComparing;
+        }
+
+        public bool GetIsMultiComparing()
+        {
+            return isMultiComparing;
         }
     }
 }
