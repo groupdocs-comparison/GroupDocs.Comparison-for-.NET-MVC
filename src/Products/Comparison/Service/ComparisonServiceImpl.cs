@@ -271,9 +271,9 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
             }
         }
 
-        public LoadedPageEntity LoadResultPage(PostedDataEntity loadResultPageRequest)
+        public PageDescriptionEntity LoadResultPage(PostedDataEntity loadResultPageRequest)
         {
-            LoadedPageEntity loadedPage = new LoadedPageEntity();
+            PageDescriptionEntity loadedPage = new PageDescriptionEntity();
             //load file with results
             try
             {
@@ -286,7 +286,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
                         bytes = ms.ToArray();
                     }
 
-                    loadedPage.pageImage = Convert.ToBase64String(bytes);
+                    loadedPage.SetData(Convert.ToBase64String(bytes));
                 }
             }
             catch (Exception ex)
