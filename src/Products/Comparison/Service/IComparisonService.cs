@@ -41,7 +41,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
         /// </summary>
         /// <param name="loadResultPageRequest">PostedDataEntity</param>
         /// <returns>LoadedPageEntity</returns>
-        LoadedPageEntity LoadResultPage(PostedDataEntity loadResultPageRequest);
+        PageDescriptionEntity LoadResultPage(PostedDataEntity loadResultPageRequest);
 
         /// <summary>
         ///  Produce file names for results
