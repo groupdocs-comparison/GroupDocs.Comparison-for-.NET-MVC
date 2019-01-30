@@ -18,7 +18,6 @@ GroupDocs.Comparison UI suite is a native, simple, fully configurable and optimi
 ## Demo Video
 Coming soon
 
-
 ## Features
 #### GroupDocs.Comparison
 - Clean, modern and intuitive design
