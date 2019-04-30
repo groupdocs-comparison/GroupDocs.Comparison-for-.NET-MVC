@@ -13,7 +13,7 @@ New GroupDocs.Comparison for .NET MVC UI Example
 
 ## Compare documents with .NET API
 
-**GroupDocs.Comparison for .NET** is a library that allows you to **compare PDF, DOCX, PPT, XLS**, and over 90 other document formats. With GroupDocs.Comparison for .NET you will be able to compare two or more files perform style and text comparison and generate a detailed report with changes in documents.
+**GroupDocs.Comparison for .NET** is a library that allows you to **compare PDF, DOCX, PPT, XLS,** and over 90 other document formats. With GroupDocs.Comparison for Java you will be able to compare two or more files, perform style and text comparison and generate a detailed report with changes.
 
 This application allows you to compare multiple documents and can be used as a standalone application or integrated as part of your project.
 
