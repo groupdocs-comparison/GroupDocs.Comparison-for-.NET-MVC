@@ -55,6 +55,4 @@ comparison:
   # Result pages preload
   # How many pages from a result document should be loaded, remaining pages will be loaded on page scrolling
   # Set 0 to load all pages at once
-  preloadResultPageCount: 2
-  # Enable/disable multi comparing feature
-  multiComparing: true
+  preloadResultPageCount: 0

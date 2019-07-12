@@ -1,11 +1,11 @@
 ﻿using GroupDocs.Comparison.MVC.Products.Common.Entity.Web;
 using GroupDocs.Comparison.MVC.Products.Common.Resources;
+using GroupDocs.Comparison.MVC.Products.Common.Util.LowercaseContractResolver;
 using GroupDocs.Comparison.MVC.Products.Comparison.Model.Request;
 using GroupDocs.Comparison.MVC.Products.Comparison.Model.Response;
 using GroupDocs.Comparison.MVC.Products.Comparison.Service;
-using GroupDocs.Comparison.MVC.Products.Comparison.Util;
+using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -34,9 +34,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
             globalConfiguration = new Common.Config.GlobalConfiguration();
             comparisonService = new ComparisonServiceImpl(globalConfiguration);
         }
-
-
-
+               
         /// <summary>
         /// Get all files and directories from storage
         /// </summary>
@@ -47,7 +45,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
         public HttpResponseMessage loadFileTree(PostedDataEntity fileTreeRequest)
         {
             return Request.CreateResponse(HttpStatusCode.OK, comparisonService.LoadFiles(fileTreeRequest));
-        }
+        }              
 
         /// <summary>
         /// Download results
@@ -55,36 +53,9 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
         /// <param name=""></param>
         [HttpGet]
         [Route("downloadDocument")]
-        public HttpResponseMessage DownloadDocument(string guid, string ext)
-        {
-            ext = (ext.Contains(".")) ? ext : "." + ext;
-            string filePath = comparisonService.CalculateResultFileName(guid, "", ext);
-            if (!string.IsNullOrEmpty(filePath))
-            {
-                if (File.Exists(filePath))
-                {
-                    HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
-                    var fileStream = new FileStream(filePath, FileMode.Open);
-                    response.Content = new StreamContent(fileStream);
-                    response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-                    response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment");
-                    response.Content.Headers.ContentDisposition.FileName = System.IO.Path.GetFileName(filePath);
-                    return response;
-                }
-            }
-            return new HttpResponseMessage(HttpStatusCode.NotFound);
-        }
-
-        /// <summary>
-        /// Download results
-        /// </summary>
-        /// <param name=""></param>
-        [HttpGet]
-        [Route("downloadDocument")]
-        public HttpResponseMessage DownloadDocument(string guid, string ext, string index)
-        {
-            ext = (ext.Contains(".")) ? ext : "." + ext;
-            string filePath = comparisonService.CalculateResultFileName(guid, index, ext);
+        public HttpResponseMessage DownloadDocument(string guid)
+        {          
+            string filePath = guid;
             if (!string.IsNullOrEmpty(filePath))
             {
                 if (File.Exists(filePath))
@@ -177,16 +148,21 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
         /// <param name="compareRequest"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("compareWithPaths")]
-        public HttpResponseMessage CompareWithPaths(CompareRequest compareRequest)
+        [Route("compare")]
+        public HttpResponseMessage Compare(CompareRequest compareRequest)
         {
             try
             {
                 // check formats
-                if (comparisonService.CheckFiles(compareRequest.firstPath, compareRequest.secondPath))
+                if (comparisonService.CheckFiles(compareRequest))
                 {
                     // compare
-                    return Request.CreateResponse(HttpStatusCode.OK, comparisonService.Compare(compareRequest));
+                    CompareResultResponse result = comparisonService.Compare(compareRequest);
+                    JsonSerializerSettings settings = new JsonSerializerSettings();
+                    settings.ContractResolver = new LowercaseContractResolver();
+                    string json = JsonConvert.SerializeObject(result, Formatting.Indented, settings);
+                    var compareResult = JsonConvert.DeserializeObject(json);
+                    return Request.CreateResponse(HttpStatusCode.OK, compareResult);
                 }
                 else
                 {
@@ -197,84 +173,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.OK, new Resources().GenerateException(ex));
             }
-        }
-
-        /// <summary>
-        /// Compare documents from form formats
-        /// </summary>
-        /// <param name=""></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("compareFiles")]
-        public HttpResponseMessage CompareFiles()
-        {
-            try
-            {
-                CompareRequest requestData = comparisonService.GetFormData(HttpContext.Current.Request);
-                // check formats
-                if (comparisonService.CheckFiles(requestData.firstPath, requestData.secondPath))
-                {
-                    // compare
-                    CompareResultResponse result = comparisonService.CompareFiles(requestData.files[0],
-                        requestData.firstPassword,
-                        requestData.files[1],
-                        requestData.secondPassword,
-                        System.IO.Path.GetExtension(requestData.firstPath));
-                    return Request.CreateResponse(HttpStatusCode.OK, result);
-                }
-                else
-                {
-                    return Request.CreateResponse(HttpStatusCode.OK, new Resources().GenerateException(new Exception("Document types are different")));
-                }
-            }
-            catch (Exception ex)
-            {
-                return Request.CreateResponse(HttpStatusCode.OK, new Resources().GenerateException(ex));
-            }
-        }
-
-        /// <summary>
-        /// Compare two files by urls
-        /// </summary>
-        /// <param name="compareRequest"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("compareWithUrls")]
-        public HttpResponseMessage CompareWithUrls(CompareRequest compareRequest)
-        {
-            try
-            {
-                string firstPath = compareRequest.firstPath;
-                string secondPath = compareRequest.secondPath;
-                // check formats
-                if (comparisonService.CheckFiles(firstPath, secondPath))
-                {
-                    string firstPassword = compareRequest.firstPassword;
-                    string secondPassword = compareRequest.secondPassword;
-                    // open streams for urls
-                    Stream firstContent = null;
-                    Stream secondContent = null;
-                    using (WebClient client = new WebClient())
-                    {
-                        byte[] firstFile = client.DownloadData(firstPath);
-                        firstContent = new MemoryStream(firstFile);
-                        byte[] secondFile = client.DownloadData(secondPath);
-                        secondContent = new MemoryStream(secondFile);
-                    };
-                    // compare
-                    CompareResultResponse compare = comparisonService.CompareFiles(firstContent, firstPassword, secondContent, secondPassword, System.IO.Path.GetExtension(firstPath));
-                    return Request.CreateResponse(HttpStatusCode.OK, compare);
-                }
-                else
-                {
-                    throw new Exception("Document types are different");
-                }
-            }
-            catch (IOException e)
-            {
-                return Request.CreateResponse(HttpStatusCode.OK, new Resources().GenerateException(new Exception("Exception occurred while compare files by urls.")));
-            }
-        }
+        }        
 
         /// <summary>
         /// Get result page
@@ -282,86 +181,52 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
         /// <param name="loadResultPageRequest"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("loadResultPage")]
-        public HttpResponseMessage LoadResultPage(PostedDataEntity loadResultPageRequest)
-        {
-            return Request.CreateResponse(HttpStatusCode.OK, comparisonService.LoadResultPage(loadResultPageRequest));
-        }
-
-        /// <summary>
-        ///  Compare 2 files got by different ways
-        /// </summary>
-        /// <param name=""></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("compare")]
-        public HttpResponseMessage Compare()
+        [Route("loadDocumentDescription")]
+        public HttpResponseMessage LoadDocumentDescription(PostedDataEntity loadResultPageRequest)
         {
             try
             {
-                CompareRequest requestData = comparisonService.GetFormData(HttpContext.Current.Request);
-                // transform all files into input streams
-                TransformFiles transformFiles = new TransformFiles(requestData.files, requestData.passwords, requestData.urls, requestData.paths).TransformToStreams();
-                List<string> fileNames = transformFiles.GetFileNames();
-
-                // check formats
-                if (comparisonService.CheckMultiFiles(fileNames))
+                LoadDocumentEntity document = comparisonService.LoadDocumentPages(loadResultPageRequest.guid, loadResultPageRequest.password);
+                return Request.CreateResponse(HttpStatusCode.OK, document);
+            } catch (System.Exception ex) {
+                FileLoadException passwordError = null;
+                if (ex.InnerException.ToString().Contains("Password"))
                 {
-                    // get file extension
-                    string ext = System.IO.Path.GetExtension(fileNames[0]);
-
-                    // compare
-                    List<Stream> newFiles = transformFiles.GetNewFiles();
-                    List<string> newPasswords = transformFiles.GetNewPasswords();                  
-                    return Request.CreateResponse(HttpStatusCode.OK, comparisonService.CompareFiles(newFiles[0], newPasswords[0], newFiles[1], newPasswords[1], ext));
+                    passwordError = new FileLoadException("Invalid password");
                 }
-                else
+                // set exception message
+                if(passwordError != null)
                 {
-                    throw new Exception("Document types are different");
+                    return Request.CreateResponse(HttpStatusCode.OK, new Resources().GenerateException(passwordError, loadResultPageRequest.password));
+                } else {
+                    return Request.CreateResponse(HttpStatusCode.OK, new Resources().GenerateException(ex, loadResultPageRequest.password));
                 }
-            }
-            catch (Exception ex)
-            {
-                return Request.CreateResponse(HttpStatusCode.OK, new Resources().GenerateException(ex));
-            }
+                
+            }        
         }
 
         /// <summary>
-        /// Compare several files got by different ways
+        /// Get document page
         /// </summary>
-        /// <param name=""></param>
-        /// <returns></returns>
+        /// <param name="postedData">Post data</param>
+        /// <returns>Document page object</returns>
         [HttpPost]
-        [Route("multiCompare")]
-        public HttpResponseMessage MultiCompare()
+        [Route("loadDocumentPage")]
+        public HttpResponseMessage LoadDocumentPage(PostedDataEntity postedData)
         {
-            try
-            {
-                CompareRequest requestData = comparisonService.GetFormData(HttpContext.Current.Request);
-                // transform all files into input streams
-                TransformFiles transformFiles = new TransformFiles(requestData.files, requestData.passwords, requestData.urls, requestData.paths).TransformToStreams();
-                List<string> fileNames = transformFiles.GetFileNames();
+            return Request.CreateResponse(HttpStatusCode.OK, comparisonService.LoadDocumentPage(postedData));            
+        }
 
-                // check formats
-                if (comparisonService.CheckMultiFiles(fileNames))
-                {
-                    // get file extension
-                    string ext = System.IO.Path.GetExtension(fileNames[0]);
-
-                    // compare
-                    List<Stream> newFiles = transformFiles.GetNewFiles();
-                    List<string> newPasswords = transformFiles.GetNewPasswords();
-                    return Request.CreateResponse(HttpStatusCode.OK, comparisonService.MultiCompareFiles(newFiles, newPasswords, ext));
-                }
-                else
-                {
-                    throw new Exception("Document types are different");
-                }
-            }
-            catch (Exception ex)
-            {
-                return Request.CreateResponse(HttpStatusCode.OK, new Resources().GenerateException(ex));
-            }
+        /// <summary>
+        /// Get document info
+        /// </summary>
+        /// <param name="postedData">Post data</param>
+        /// <returns>Document info object</returns>
+        [HttpPost]
+        [Route("loadDocumentInfo")]
+        public HttpResponseMessage LoadDocumentInfo(PostedDataEntity postedData)
+        {
+            return Request.CreateResponse(HttpStatusCode.OK, comparisonService.LoadDocumentInfo(postedData));
         }
     }
 }
