@@ -1,19 +1,20 @@
-﻿using GroupDocs.Comparison.MVC.Products.Common.Config;
-using GroupDocs.Comparison.MVC.Products.Common.Util.Parser;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
+using GroupDocs.Comparison.MVC.Products.Common.Config;
+using GroupDocs.Comparison.MVC.Products.Common.Util.Parser;
 
 namespace GroupDocs.Comparison.MVC.Products.Comparison.Config
 {
     /// <summary>
     /// CommonConfiguration
     /// </summary>
-    public class ComparisonConfiguration
+    public class ComparisonConfiguration : CommonConfiguration
     {
         private string FilesDirectory = "DocumentSamples/Comparison";
         private string ResultDirectory = "DocumentSamples/Comparison/Compared";
-        private int PreloadResultPageCount = 0;         
+        private int PreloadResultPageCount = 0;
+        private bool isMultiComparing = true;
 
         /// <summary>
         /// Constructor
@@ -38,11 +39,12 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Config
             {
                 ResultDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ResultDirectory);
                 if (!Directory.Exists(ResultDirectory))
-                {                    
+                {
                     Directory.CreateDirectory(ResultDirectory);
                 }
             }
             PreloadResultPageCount = valuesGetter.GetIntegerPropertyValue("preloadResultPageCount", PreloadResultPageCount);
+            isMultiComparing = valuesGetter.GetBooleanPropertyValue("multiComparing", isMultiComparing);
         }
 
         private static bool IsFullPath(string path)
@@ -81,6 +83,16 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Config
         public int GetPreloadResultPageCount()
         {
             return PreloadResultPageCount;
-        }      
+        }
+
+        public void SetIsMultiComparing(bool isMultiComparing)
+        {
+            this.isMultiComparing = isMultiComparing;
+        }
+
+        public bool GetIsMultiComparing()
+        {
+            return isMultiComparing;
+        }
     }
 }

@@ -25,10 +25,10 @@
     <script type="text/javascript">
         $('#element').comparison({
             applicationPath: 'http://@config.Server.HostAddress:@config.Server.HttpPort/comparison/',
-            download: @config.Common.isDownload.ToString().ToLowerInvariant(),
+            @*download: @config.Common.isDownload.ToString().ToLowerInvariant(),
             upload: @config.Common.isUpload.ToString().ToLowerInvariant(),
             print: @config.Common.isPrint.ToString().ToLowerInvariant(),
-            rewrite: @config.Common.isRewrite.ToString().ToLowerInvariant(),
+            rewrite: @config.Common.isRewrite.ToString().ToLowerInvariant(),*@
             preloadResultPageCount: @config.Comparison.GetPreloadResultPageCount()           
         });
     </script>
