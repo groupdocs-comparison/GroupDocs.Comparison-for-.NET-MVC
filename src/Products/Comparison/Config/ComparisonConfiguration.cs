@@ -14,7 +14,6 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Config
         private string FilesDirectory = "DocumentSamples/Comparison";
         private string ResultDirectory = "DocumentSamples/Comparison/Compared";
         private int PreloadResultPageCount = 0;
-        private bool isMultiComparing = true;
 
         /// <summary>
         /// Constructor
@@ -44,7 +43,6 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Config
                 }
             }
             PreloadResultPageCount = valuesGetter.GetIntegerPropertyValue("preloadResultPageCount", PreloadResultPageCount);
-            isMultiComparing = valuesGetter.GetBooleanPropertyValue("multiComparing", isMultiComparing);
         }
 
         private static bool IsFullPath(string path)
@@ -83,16 +81,6 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Config
         public int GetPreloadResultPageCount()
         {
             return PreloadResultPageCount;
-        }
-
-        public void SetIsMultiComparing(bool isMultiComparing)
-        {
-            this.isMultiComparing = isMultiComparing;
-        }
-
-        public bool GetIsMultiComparing()
-        {
-            return isMultiComparing;
         }
     }
 }
