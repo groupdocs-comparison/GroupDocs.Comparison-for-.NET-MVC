@@ -1,6 +1,6 @@
 /packages
 /.vs
-/src/GroupDocs.Total.MVC.csproj.user
+/src/GroupDocs.Comparison.MVC.csproj.user
 bin
 obj
 /App_Data/temp
@@ -10,4 +10,5 @@ src/Resources/*
 !src/Resources/.gitkeep
 node_modules
 src/package-lock.json
-/src/node 
+src/client/package-lock.json
+/src/node
