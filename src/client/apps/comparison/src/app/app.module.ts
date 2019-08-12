@@ -7,7 +7,7 @@ import { ComparisonModule } from "@groupdocs.examples.angular/comparison";
 @NgModule({
   declarations: [AppComponent],
   imports: [BrowserModule,
-    ComparisonModule],
+    ComparisonModule.forRoot("http://localhost:8080")],
   providers: [],
   bootstrap: [AppComponent]
 })
