@@ -15,13 +15,5 @@
   "bugs": {
     "url": "https://github.com/groupdocs-comparison/GroupDocs.Comparison-for-.NET-MVC/issues"
   },
-  "homepage": "https://github.com/groupdocs-comparison/GroupDocs.Comparison-for-.NET-MVC#readme",
-  "dependencies": {
-    "@groupdocs.examples.jquery/common": "^0.16.0",
-    "@groupdocs.examples.jquery/comparison": "^0.16.0",
-    "@groupdocs.examples.jquery/viewer": "^0.16.1"
-  },
-  "devDependencies": {
-    "gulp": "^4.0.2"
-  }
+  "homepage": "https://github.com/groupdocs-comparison/GroupDocs.Comparison-for-.NET-MVC#readme"
 }

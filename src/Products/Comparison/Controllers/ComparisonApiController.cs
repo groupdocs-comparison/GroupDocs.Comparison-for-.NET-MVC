@@ -1,6 +1,7 @@
 ﻿using GroupDocs.Comparison.MVC.Products.Common.Entity.Web;
 using GroupDocs.Comparison.MVC.Products.Common.Resources;
 using GroupDocs.Comparison.MVC.Products.Common.Util.LowercaseContractResolver;
+using GroupDocs.Comparison.MVC.Products.Comparison.Config;
 using GroupDocs.Comparison.MVC.Products.Comparison.Model.Request;
 using GroupDocs.Comparison.MVC.Products.Comparison.Model.Response;
 using GroupDocs.Comparison.MVC.Products.Comparison.Service;
@@ -34,7 +35,18 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
             globalConfiguration = new Common.Config.GlobalConfiguration();
             comparisonService = new ComparisonServiceImpl(globalConfiguration);
         }
-               
+
+        /// <summary>
+        /// Load Comparison configuration
+        /// </summary>
+        /// <returns>Comparison configuration</returns>
+        [HttpGet]
+        [Route("loadConfig")]
+        public ComparisonConfiguration LoadConfig()
+        {
+            return globalConfiguration.Comparison;
+        }
+
         /// <summary>
         /// Get all files and directories from storage
         /// </summary>
@@ -138,7 +150,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
             catch (System.Exception ex)
             {
                 // set exception message
-                return Request.CreateResponse(HttpStatusCode.OK, new Resources().GenerateException(ex));
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, new Resources().GenerateException(ex));
             }
         }
 
@@ -171,7 +183,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
             }
             catch (Exception ex)
             {
-                return Request.CreateResponse(HttpStatusCode.OK, new Resources().GenerateException(ex));
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, new Resources().GenerateException(ex));
             }
         }        
 
