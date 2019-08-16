@@ -9,14 +9,8 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
 {
     public interface IComparisonService
     {
-        List<FileDescriptionEntity> LoadFiles(PostedDataEntity fileTreeRequest);
 
-        /// <summary>
-        /// Convert FormData object to CompareRequest object
-        /// </summary>
-        /// <param name="request">HttpRequest</param>
-        /// <returns></returns>
-        CompareRequest GetFormData(HttpRequest request);
+        List<FileDescriptionEntity> LoadFiles(PostedDataEntity fileTreeRequest);
 
         /// <summary>
         /// Compare two documents, save results in files
@@ -26,54 +20,32 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
         CompareResultResponse Compare(CompareRequest compareRequest);
 
         /// <summary>
-        /// Compare two documents, save results in files,
+        ///  Load document pages as images
         /// </summary>
-        /// <param name="firstContent">Stream</param>
-        /// <param name="firstPassword">string</param>
-        /// <param name="secondContent">Stream</param>
-        /// <param name="secondPassword">string</param>
-        /// <param name="fileExt">string</param>
-        /// <returns>CompareResultResponse</returns>
-        CompareResultResponse CompareFiles(Stream firstContent, string firstPassword, Stream secondContent, string secondPassword, string fileExt);
+        /// <param name="path">string</param>
+        /// <param name="password">string</param>
+        /// <returns>LoadDocumentEntity</returns>
+        LoadDocumentEntity LoadDocumentPages(string path, string password);
 
         /// <summary>
-        ///  Load the page of results
+        ///  Load document page as images
         /// </summary>
-        /// <param name="loadResultPageRequest">PostedDataEntity</param>
-        /// <returns>LoadedPageEntity</returns>
-        PageDescriptionEntity LoadResultPage(PostedDataEntity loadResultPageRequest);
+        /// <param name="postedData">PostedDataEntity</param>
+        /// <returns>LoadDocumentEntity</returns>
+        PageDescriptionEntity LoadDocumentPage(PostedDataEntity postedData);
 
         /// <summary>
-        ///  Produce file names for results
+        ///  Load document info
         /// </summary>
-        /// <param name="documentGuid">string</param>
-        /// <param name="index">int</param>
-        /// <param name="ext">string</param>
-        /// <returns>string</returns>
-        string CalculateResultFileName(string documentGuid, string index, string ext);
+        /// <param name="postedData">PostedDataEntity</param>
+        /// <returns>LoadDocumentEntity</returns>
+        LoadDocumentEntity LoadDocumentInfo(PostedDataEntity postedData);
 
         /// <summary>
         /// Check format files for comparing
         /// </summary>
-        /// <param name="firstFileName">string</param>
-        /// <param name="secondFileName">string</param>
+        /// <param name="file">CompareRequest</param>
         /// <returns>bool</returns>
-        bool CheckFiles(string firstFileName, string secondFileName);
-
-        /// <summary>
-        /// Compare several files
-        /// </summary>
-        /// <param name="files">List[Stream]</param>
-        /// <param name="passwords">List[string]</param>
-        /// <param name="ext">string</param>
-        /// <returns>CompareResultResponse</returns>
-        CompareResultResponse MultiCompareFiles(List<Stream> files, List<string> passwords, string ext);
-
-        /// <summary>
-        /// Check format files for comparing
-        /// </summary>
-        /// <param name="fileNames">List[string]</param>
-        /// <returns>bool</returns>
-        bool CheckMultiFiles(List<string> fileNames);
+        bool CheckFiles(CompareRequest files);       
     }
 }

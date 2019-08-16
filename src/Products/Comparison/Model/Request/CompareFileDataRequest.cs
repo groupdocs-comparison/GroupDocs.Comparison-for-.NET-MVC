@@ -6,19 +6,19 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Model.Request
     public class CompareFileDataRequest
     {
         [JsonProperty]
-        private string file { get; set; }
+        private string guid { get; set; }
 
         [JsonProperty]
         private string password { get; set; }
 
-        public void SetFile(string file)
+        public void SetGuid(string guid)
         {
-            this.file = file;
+            this.guid = guid;
         }
 
-        public string GetFile()
+        public string GetGuid()
         {
-            return file;
+            return guid;
         }
 
         public void SetPassword(string password)

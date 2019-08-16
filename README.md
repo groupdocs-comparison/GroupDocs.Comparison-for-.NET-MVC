@@ -1,6 +1,7 @@
+![GroupDocs.Comparison](https://raw.githubusercontent.com/groupdocs-comparison/groupdocs-comparison.github.io/master/resources/image/banner.png "GroupDocs.Comparison")
 # GroupDocs.Comparison for .NET MVC Example
 New GroupDocs.Comparison for .NET MVC UI Example
-###### version 1.8.0
+###### version 1.8.0 
 
 [![Build status](https://ci.appveyor.com/api/projects/status/a0u7vnsndwl64krd/branch/master?svg=true)](https://ci.appveyor.com/project/egorovpavel/groupdocs-comparison-for-net-mvc/branch/master)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b697a8607aac43d5a049697cb380b7b5)](https://www.codacy.com/app/GroupDocs/GroupDocs.Comparison-for-.NET-MVC?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=groupdocs-comparison/GroupDocs.Comparison-for-.NET-MVC&amp;utm_campaign=Badge_Grade)
@@ -21,7 +22,12 @@ This application allows you to compare multiple documents and can be used as a s
 
 
 ## Demo Video
-Coming soon
+
+<p align="center">
+  <a title="Document comparison for JAVA " href="https://www.youtube.com/watch?v=82RuvtV2qpw"> 
+    <img src="https://raw.githubusercontent.com/groupdocs-comparison/groupdocs-comparison.github.io/master/resources/image/comparison.gif" width="100%" style="width:100%;">
+  </a>
+</p>
 
 ## Features
 #### GroupDocs.Comparison
