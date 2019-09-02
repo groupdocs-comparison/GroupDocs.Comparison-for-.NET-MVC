@@ -99,7 +99,6 @@ Please have a look at the LICENSE.md for more details
 
 - [Comapre documents](https://github.com/groupdocs-comparison/GroupDocs.Comparison-for-Java-Spring) with JAVA Spring 
 - [Comapre documents](https://github.com/groupdocs-comparison/GroupDocs.Comparison-for-Java-Dropwizard) with JAVA Dropwizard 
-- [Comapre documents](https://github.com/groupdocs-comparison/GroupDocs.Comparison-for-.NET-MVC) with .NET MVC 
 - [Comapre documents](https://github.com/groupdocs-comparison/GroupDocs.Comparison-for-.NET-WebForms) with .NET WebForms 
 
 ## Resources
