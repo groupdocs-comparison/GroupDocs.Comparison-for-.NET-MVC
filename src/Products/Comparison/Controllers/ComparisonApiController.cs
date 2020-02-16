@@ -209,9 +209,9 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
                 // set exception message
                 if(passwordError != null)
                 {
-                    return Request.CreateResponse(HttpStatusCode.OK, new Resources().GenerateException(passwordError, loadResultPageRequest.password));
+                    return Request.CreateResponse(HttpStatusCode.InternalServerError, new Resources().GenerateException(passwordError, loadResultPageRequest.password));
                 } else {
-                    return Request.CreateResponse(HttpStatusCode.OK, new Resources().GenerateException(ex, loadResultPageRequest.password));
+                    return Request.CreateResponse(HttpStatusCode.InternalServerError, new Resources().GenerateException(ex, loadResultPageRequest.password));
                 }
                 
             }        
