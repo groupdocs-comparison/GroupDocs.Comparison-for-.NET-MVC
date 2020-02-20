@@ -26,7 +26,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
         private static readonly string HTML = ".html";
         private static readonly string HTM = ".htm";
 
-        private GlobalConfiguration globalConfiguration;
+        private readonly GlobalConfiguration globalConfiguration;
 
         public ComparisonServiceImpl(GlobalConfiguration globalConfiguration)
         {
@@ -61,13 +61,8 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
                 {
                     FileInfo fileInfo = new FileInfo(file);
                     // check if current file/folder is hidden
-                    if (fileInfo.Attributes.HasFlag(FileAttributes.Hidden) ||
-                        Path.GetFileName(file).Equals(Path.GetFileName(globalConfiguration.Comparison.GetFilesDirectory())))
-                    {
-                        // ignore current file and skip to next one
-                        continue;
-                    }
-                    else
+                    if (!(fileInfo.Attributes.HasFlag(FileAttributes.Hidden) ||
+                        Path.GetFileName(file).Equals(Path.GetFileName(globalConfiguration.Comparison.GetFilesDirectory()))))
                     {
                         FileDescriptionEntity fileDescription = new FileDescriptionEntity();
                         fileDescription.guid = Path.GetFullPath(file);
@@ -85,9 +80,9 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
                 }
                 return fileList;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -175,10 +170,9 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
                 loadedPage.width = resultImages[pageNumber - 1].Width;
 
             }
-            catch (System.Exception ex)
+            catch (Exception)
             {
-                // set exception message
-                throw new Exception("Exception occurred while loading result page", ex);
+                throw;
             }
             return loadedPage;
         }
@@ -243,7 +237,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
 
             if (compareResult == null)
             {
-                throw new Exception("Something went wrong. We've got null result.");
+                throw new NullReferenceException("Something went wrong. We've got null result.");
             }
             return compareResult;
         }
@@ -278,43 +272,9 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
             }
             catch (IOException)
             {
-                throw new Exception("Exception occurred while write result images files.");
+                throw new IOException("Exception occurred while write result images files.");
             }
             return fileName;
-        }
-
-        /// <summary>
-        /// Fix file extensions for some formats
-        /// </summary>
-        /// <param name="ext">string</param>
-        /// <returns></returns>
-        private string GetRightExt(string ext)
-        {
-            switch (ext)
-            {
-                case ".doc":
-                    return DOC;
-                case ".docx":
-                    return DOCX;
-                case ".xls":
-                    return XLS;
-                case ".xlsx":
-                    return XLSX;
-                case ".ppt":
-                    return PPT;
-                case ".pptx":
-                    return PPTX;
-                case ".pdf":
-                    return PDF;
-                case ".txt":
-                    return TXT;
-                case ".html":
-                    return HTML;
-                case ".htm":
-                    return HTM;
-                default:
-                    return ext;
-            }
         }
 
         /// <summary>
