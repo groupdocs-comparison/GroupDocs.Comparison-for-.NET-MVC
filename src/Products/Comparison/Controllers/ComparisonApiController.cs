@@ -23,8 +23,8 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class ComparisonApiController : ApiController
     {
-        private IComparisonService comparisonService;
-        private static Common.Config.GlobalConfiguration globalConfiguration;
+        private readonly IComparisonService comparisonService;
+        private static readonly Common.Config.GlobalConfiguration globalConfiguration = new Common.Config.GlobalConfiguration();
 
         /// <summary>
         /// Constructor
@@ -32,7 +32,6 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
         /// <param name="globalConfiguration">GlobalConfiguration</param>
         public ComparisonApiController()
         {
-            globalConfiguration = new Common.Config.GlobalConfiguration();
             comparisonService = new ComparisonServiceImpl(globalConfiguration);
         }
 

@@ -13,7 +13,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Config
     {
         private string FilesDirectory = "DocumentSamples/Comparison";
         private string ResultDirectory = "DocumentSamples/Comparison/Compared";
-        private int PreloadResultPageCount = 0;
+        private int PreloadResultPageCount;
 
         /// <summary>
         /// Constructor

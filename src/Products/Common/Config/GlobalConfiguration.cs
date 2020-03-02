@@ -7,10 +7,10 @@ namespace GroupDocs.Comparison.MVC.Products.Common.Config
     /// </summary>
     public class GlobalConfiguration
     {
-        public ServerConfiguration Server;
-        public ApplicationConfiguration Application;
-        public CommonConfiguration Common;
-        public ComparisonConfiguration Comparison;
+        public ServerConfiguration Server { get; set; }
+        public ApplicationConfiguration Application { get; set; }
+        public CommonConfiguration Common { get; set; }
+        public ComparisonConfiguration Comparison { get; set; }
 
         /// <summary>
         /// Get all configurations
