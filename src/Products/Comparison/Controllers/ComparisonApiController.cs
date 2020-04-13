@@ -184,7 +184,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, new Resources().GenerateException(ex));
             }
-        }        
+        }
 
         /// <summary>
         /// Get result page
@@ -197,7 +197,9 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
         {
             try
             {
-                LoadDocumentEntity document = comparisonService.LoadDocumentPages(loadResultPageRequest.guid, loadResultPageRequest.password);
+                LoadDocumentEntity document = comparisonService.LoadDocumentPages(loadResultPageRequest.guid, 
+                                                                                  loadResultPageRequest.password, 
+                                                                                  globalConfiguration.Comparison.GetPreloadResultPageCount() == 0);
                 return Request.CreateResponse(HttpStatusCode.OK, document);
             } catch (System.Exception ex) {
                 FileLoadException passwordError = null;
@@ -212,7 +214,6 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
                 } else {
                     return Request.CreateResponse(HttpStatusCode.InternalServerError, new Resources().GenerateException(ex, loadResultPageRequest.password));
                 }
-                
             }        
         }
 
@@ -225,19 +226,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
         [Route("loadDocumentPage")]
         public HttpResponseMessage LoadDocumentPage(PostedDataEntity postedData)
         {
-            return Request.CreateResponse(HttpStatusCode.OK, comparisonService.LoadDocumentPage(postedData));            
-        }
-
-        /// <summary>
-        /// Get document info
-        /// </summary>
-        /// <param name="postedData">Post data</param>
-        /// <returns>Document info object</returns>
-        [HttpPost]
-        [Route("loadDocumentInfo")]
-        public HttpResponseMessage LoadDocumentInfo(PostedDataEntity postedData)
-        {
-            return Request.CreateResponse(HttpStatusCode.OK, comparisonService.LoadDocumentInfo(postedData));
+            return Request.CreateResponse(HttpStatusCode.OK, comparisonService.LoadDocumentPage(postedData));
         }
     }
 }

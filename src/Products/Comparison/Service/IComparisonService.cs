@@ -2,8 +2,6 @@
 using GroupDocs.Comparison.MVC.Products.Comparison.Model.Request;
 using GroupDocs.Comparison.MVC.Products.Comparison.Model.Response;
 using System.Collections.Generic;
-using System.IO;
-using System.Web;
 
 namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
 {
@@ -25,7 +23,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
         /// <param name="path">string</param>
         /// <param name="password">string</param>
         /// <returns>LoadDocumentEntity</returns>
-        LoadDocumentEntity LoadDocumentPages(string path, string password);
+        LoadDocumentEntity LoadDocumentPages(string path, string password, bool loadAllPages);
 
         /// <summary>
         ///  Load document page as images
@@ -33,13 +31,6 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
         /// <param name="postedData">PostedDataEntity</param>
         /// <returns>LoadDocumentEntity</returns>
         PageDescriptionEntity LoadDocumentPage(PostedDataEntity postedData);
-
-        /// <summary>
-        ///  Load document info
-        /// </summary>
-        /// <param name="postedData">PostedDataEntity</param>
-        /// <returns>LoadDocumentEntity</returns>
-        LoadDocumentEntity LoadDocumentInfo(PostedDataEntity postedData);
 
         /// <summary>
         /// Check format files for comparing
