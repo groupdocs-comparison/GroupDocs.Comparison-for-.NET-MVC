@@ -106,7 +106,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
             //load file with results
             try
             {
-                using (Comparer comparer = new Comparer(path))
+                using (Comparer comparer = new Comparer(path, GetLoadOptions(password)))
                 {
                     List<string> pagesContent = new List<string>();
                     IDocumentInfo documentInfo = comparer.Source.GetDocumentInfo();
@@ -197,7 +197,6 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
                 {
                     using (Comparer comparer = new Comparer(fileStream, GetLoadOptions(password)))
                     {
-
                         byte[] bytes = RenderPageToMemoryStream(comparer, pageNumber - 1).ToArray();
                         string encodedImage = Convert.ToBase64String(bytes);
                         loadedPage.SetData(encodedImage);
@@ -223,18 +222,12 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
             PreviewOptions previewOptions = new PreviewOptions(pageNumber => result)
             {
                 PreviewFormat = PreviewFormats.PNG,
-                PageNumbers = new[] { pageNumberToRender },
-                ReleasePageStream = UserReleaseStreamMethod
+                PageNumbers = new[] { pageNumberToRender }
             };
 
             comparer.Source.GeneratePreview(previewOptions);
 
             return result;
-        }
-
-        private static void UserReleaseStreamMethod(int pageNumber, Stream stream)
-        {
-            stream.Close();
         }
 
         private static LoadOptions GetLoadOptions(string password)
@@ -264,23 +257,23 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
             return compareResultResponse;
         }
 
-        private Comparer CompareFiles(CompareRequest compareRequest, string resultGuid)
+        private static Comparer CompareFiles(CompareRequest compareRequest, string resultGuid)
         {
             string firstPath = compareRequest.guids[0].GetGuid();
             string secondPath = compareRequest.guids[1].GetGuid();
 
             // create new comparer
-            using (Comparer comparer = new Comparer(firstPath))
-            {
-                comparer.Add(secondPath);
-                CompareOptions compareOptions = new CompareOptions() { CalculateCoordinates = true };
-                using (FileStream outputStream = File.Create(Path.Combine(resultGuid)))
-                {
-                    comparer.Compare(outputStream, compareOptions);
-                }
+            Comparer comparer = new Comparer(firstPath, GetLoadOptions(compareRequest.guids[0].GetPassword()));
+            
+            comparer.Add(secondPath, GetLoadOptions(compareRequest.guids[1].GetPassword()));
+            CompareOptions compareOptions = new CompareOptions{ CalculateCoordinates = true };
 
-                return comparer;
+            using (FileStream outputStream = File.Create(Path.Combine(resultGuid)))
+            {
+                comparer.Compare(outputStream, compareOptions);
             }
+
+            return comparer;
         }
 
         private CompareResultResponse GetCompareResultResponse(ChangeInfo[] changes, string resultGuid)

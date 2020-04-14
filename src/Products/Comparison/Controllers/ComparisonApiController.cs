@@ -56,7 +56,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
         public HttpResponseMessage loadFileTree(PostedDataEntity fileTreeRequest)
         {
             return Request.CreateResponse(HttpStatusCode.OK, comparisonService.LoadFiles(fileTreeRequest));
-        }              
+        }
 
         /// <summary>
         /// Download results
@@ -65,7 +65,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
         [HttpGet]
         [Route("downloadDocument")]
         public HttpResponseMessage DownloadDocument(string guid)
-        {          
+        {
             string filePath = guid;
             if (!string.IsNullOrEmpty(filePath))
             {
@@ -197,11 +197,12 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
         {
             try
             {
-                LoadDocumentEntity document = comparisonService.LoadDocumentPages(loadResultPageRequest.guid, 
-                                                                                  loadResultPageRequest.password, 
+                LoadDocumentEntity document = comparisonService.LoadDocumentPages(loadResultPageRequest.guid,
+                                                                                  loadResultPageRequest.password,
                                                                                   globalConfiguration.Comparison.GetPreloadResultPageCount() == 0);
                 return Request.CreateResponse(HttpStatusCode.OK, document);
-            } catch (System.Exception ex) {
+            }
+            catch (System.Exception ex) {
                 FileLoadException passwordError = null;
                 if (ex.InnerException.ToString().Contains("Password"))
                 {
@@ -210,11 +211,11 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
                 // set exception message
                 if(passwordError != null)
                 {
-                    return Request.CreateResponse(HttpStatusCode.InternalServerError, new Resources().GenerateException(passwordError, loadResultPageRequest.password));
+                    return Request.CreateResponse(HttpStatusCode.Forbidden, new Resources().GenerateException(passwordError, loadResultPageRequest.password));
                 } else {
                     return Request.CreateResponse(HttpStatusCode.InternalServerError, new Resources().GenerateException(ex, loadResultPageRequest.password));
                 }
-            }        
+            }
         }
 
         /// <summary>
