@@ -100,46 +100,26 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
             return compareResultResponse;
         }
 
-        public LoadDocumentEntity LoadDocumentPages(string path, string password, bool loadAllPages)
+        public LoadDocumentEntity LoadDocumentPages(string documentGuid, string password, bool loadAllPages)
         {
             LoadDocumentEntity loadDocumentEntity = new LoadDocumentEntity();
             //load file with results
             try
             {
-                using (Comparer comparer = new Comparer(path, GetLoadOptions(password)))
+                using (Comparer comparer = new Comparer(documentGuid, GetLoadOptions(password)))
                 {
-                    List<string> pagesContent = new List<string>();
+                    Dictionary<int, string> pagesContent = new Dictionary<int, string>();
                     IDocumentInfo documentInfo = comparer.Source.GetDocumentInfo();
 
                     if (loadAllPages)
                     {
-                        var fileName = Path.GetFileNameWithoutExtension(path);
-
-                        PreviewOptions previewOptions = new PreviewOptions(pageNumber =>
+                        for (int i = 0; i < documentInfo.PageCount; i++)
                         {
-                            var pagePath = Path.Combine(globalConfiguration.Comparison.GetFilesDirectory(), $"{fileName}_{pageNumber}.png");
-                            return File.Create(pagePath);
-                        })
-                        {
-                            PreviewFormat = PreviewFormats.PNG,
-                            PageNumbers = GetPagesNumbersArray(documentInfo.PageCount)
-                        };
-                        comparer.Source.GeneratePreview(previewOptions);
-
-                        string[] files = Directory.GetFiles(globalConfiguration.Comparison.GetFilesDirectory(),
-                                fileName + "_*" + ".png");
-
-                        foreach (string file in files)
-                        {
-                            using (FileStream outputStream = File.OpenRead(Path.Combine(file)))
+                            using (FileStream fileStream = File.Open(documentGuid, FileMode.Open, FileAccess.ReadWrite, FileShare.Read))
                             {
-                                var memoryStream = new MemoryStream();
-                                outputStream.CopyTo(memoryStream);
+                                string encodedImage = GetPageData(i, password, fileStream);
 
-                                byte[] pageBytes = memoryStream.ToArray();
-                                string encodedImage = Convert.ToBase64String(pageBytes);
-
-                                pagesContent.Add(encodedImage);
+                                pagesContent.Add(i, encodedImage);
                             }
                         }
                     }
@@ -170,18 +150,6 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
             }
         }
 
-        static int[] GetPagesNumbersArray(int arrLength)
-        {
-            int[] pageNumbersArr = new int[arrLength];
-
-            for (int i = 0; i < arrLength; i++)
-            {
-                pageNumbersArr[i] = i + 1;
-            }
-
-            return pageNumbersArr;
-        }
-
         public PageDescriptionEntity LoadDocumentPage(PostedDataEntity postedData)
         {
             PageDescriptionEntity loadedPage = new PageDescriptionEntity();
@@ -195,16 +163,11 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
 
                 using (FileStream fileStream = File.Open(documentGuid, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
                 {
-                    using (Comparer comparer = new Comparer(fileStream, GetLoadOptions(password)))
-                    {
-                        byte[] bytes = RenderPageToMemoryStream(comparer, pageNumber - 1).ToArray();
-                        string encodedImage = Convert.ToBase64String(bytes);
-                        loadedPage.SetData(encodedImage);
+                    loadedPage.SetData(GetPageData(pageNumber - 1, password, fileStream));
 
-                        loadedPage.number = pageNumber;
-                        loadedPage.height = 842;
-                        loadedPage.width = 595;
-                    }
+                    loadedPage.number = pageNumber;
+                    loadedPage.height = 842;
+                    loadedPage.width = 595;
                 }
             }
             catch (Exception ex)
@@ -215,6 +178,19 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
             return loadedPage;
         }
 
+        private static string GetPageData(int pageNumber, string password, FileStream fileStream)
+        {
+            string encodedImage = "";
+
+            using (Comparer comparer = new Comparer(fileStream, GetLoadOptions(password)))
+            {
+                byte[] bytes = RenderPageToMemoryStream(comparer, pageNumber).ToArray();
+                encodedImage = Convert.ToBase64String(bytes);
+            }
+
+            return encodedImage;
+        }
+
         static MemoryStream RenderPageToMemoryStream(Comparer comparer, int pageNumberToRender)
         {
             MemoryStream result = new MemoryStream();
@@ -222,7 +198,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
             PreviewOptions previewOptions = new PreviewOptions(pageNumber => result)
             {
                 PreviewFormat = PreviewFormats.PNG,
-                PageNumbers = new[] { pageNumberToRender }
+                PageNumbers = new[] { pageNumberToRender + 1 }
             };
 
             comparer.Source.GeneratePreview(previewOptions);
