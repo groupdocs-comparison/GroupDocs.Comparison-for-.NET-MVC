@@ -50,7 +50,9 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
                     System.IO.FileInfo fileInfo = new System.IO.FileInfo(file);
                     // check if current file/folder is hidden
                     if (!(fileInfo.Attributes.HasFlag(FileAttributes.Hidden) ||
-                        Path.GetFileName(file).Equals(Path.GetFileName(globalConfiguration.Comparison.GetFilesDirectory()))))
+                        Path.GetFileName(file).Equals(".gitkeep") ||
+                        Path.GetFileName(file).Equals(Path.GetFileName(globalConfiguration.Comparison.GetFilesDirectory())) ||
+                        Path.GetFileName(file).Equals(Path.GetFileName(globalConfiguration.Comparison.GetResultDirectory()))))
                     {
                         FileDescriptionEntity fileDescription = new FileDescriptionEntity
                         {
@@ -198,7 +200,9 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
             PreviewOptions previewOptions = new PreviewOptions(pageNumber => result)
             {
                 PreviewFormat = PreviewFormats.PNG,
-                PageNumbers = new[] { pageNumberToRender + 1 }
+                PageNumbers = new[] { pageNumberToRender + 1 },
+                Height = 842,
+                Width = 595
             };
 
             comparer.Source.GeneratePreview(previewOptions);
@@ -243,6 +247,11 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
             
             comparer.Add(secondPath, GetLoadOptions(compareRequest.guids[1].GetPassword()));
             CompareOptions compareOptions = new CompareOptions{ CalculateCoordinates = true };
+            
+            if (Path.GetExtension(resultGuid) == ".pdf") 
+            {
+                compareOptions.DetalisationLevel = DetalisationLevel.High;
+            }
 
             using (FileStream outputStream = File.Create(Path.Combine(resultGuid)))
             {
