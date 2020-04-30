@@ -50,7 +50,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
                     System.IO.FileInfo fileInfo = new System.IO.FileInfo(file);
                     // check if current file/folder is hidden
                     if (!(fileInfo.Attributes.HasFlag(FileAttributes.Hidden) ||
-                        Path.GetFileName(file).Equals(".gitkeep") ||
+                        Path.GetFileName(file).StartsWith(".") ||
                         Path.GetFileName(file).Equals(Path.GetFileName(globalConfiguration.Comparison.GetFilesDirectory())) ||
                         Path.GetFileName(file).Equals(Path.GetFileName(globalConfiguration.Comparison.GetResultDirectory()))))
                     {
@@ -102,53 +102,46 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
             return compareResultResponse;
         }
 
-        public LoadDocumentEntity LoadDocumentPages(string documentGuid, string password, bool loadAllPages)
+        public static LoadDocumentEntity LoadDocumentPages(string documentGuid, string password, bool loadAllPages)
         {
             LoadDocumentEntity loadDocumentEntity = new LoadDocumentEntity();
-            //load file with results
-            try
+
+            using (Comparer comparer = new Comparer(documentGuid, GetLoadOptions(password)))
             {
-                using (Comparer comparer = new Comparer(documentGuid, GetLoadOptions(password)))
+                Dictionary<int, string> pagesContent = new Dictionary<int, string>();
+                IDocumentInfo documentInfo = comparer.Source.GetDocumentInfo();
+
+                if (loadAllPages)
                 {
-                    Dictionary<int, string> pagesContent = new Dictionary<int, string>();
-                    IDocumentInfo documentInfo = comparer.Source.GetDocumentInfo();
-
-                    if (loadAllPages)
-                    {
-                        for (int i = 0; i < documentInfo.PageCount; i++)
-                        {
-                            using (FileStream fileStream = File.Open(documentGuid, FileMode.Open, FileAccess.ReadWrite, FileShare.Read))
-                            {
-                                string encodedImage = GetPageData(i, password, fileStream);
-
-                                pagesContent.Add(i, encodedImage);
-                            }
-                        }
-                    }
-
                     for (int i = 0; i < documentInfo.PageCount; i++)
                     {
-                        PageDescriptionEntity pageData = new PageDescriptionEntity
+                        using (FileStream fileStream = File.Open(documentGuid, FileMode.Open, FileAccess.ReadWrite, FileShare.Read))
                         {
-                            height = 842,
-                            width = 595,
-                            number = i + 1
-                        };
+                            string encodedImage = GetPageData(i, password, fileStream);
 
-                        if (pagesContent.Count > 0)
-                        {
-                            pageData.SetData(pagesContent[i]);
+                            pagesContent.Add(i, encodedImage);
                         }
+                    }
+                }
 
-                        loadDocumentEntity.SetPages(pageData);
+                for (int i = 0; i < documentInfo.PageCount; i++)
+                {
+                    PageDescriptionEntity pageData = new PageDescriptionEntity
+                    {
+                        height = 842,
+                        width = 595,
+                        number = i + 1
+                    };
+
+                    if (pagesContent.Count > 0)
+                    {
+                        pageData.SetData(pagesContent[i]);
                     }
 
-                    return loadDocumentEntity;
+                    loadDocumentEntity.SetPages(pageData);
                 }
-            }
-            catch (Exception ex)
-            {
-                throw new FileLoadException("Exception occurred while loading result pages", ex);
+
+                return loadDocumentEntity;
             }
         }
 
@@ -244,11 +237,11 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
 
             // create new comparer
             Comparer comparer = new Comparer(firstPath, GetLoadOptions(compareRequest.guids[0].GetPassword()));
-            
+
             comparer.Add(secondPath, GetLoadOptions(compareRequest.guids[1].GetPassword()));
-            CompareOptions compareOptions = new CompareOptions{ CalculateCoordinates = true };
-            
-            if (Path.GetExtension(resultGuid) == ".pdf") 
+            CompareOptions compareOptions = new CompareOptions { CalculateCoordinates = true };
+
+            if (Path.GetExtension(resultGuid) == ".pdf")
             {
                 compareOptions.DetalisationLevel = DetalisationLevel.High;
             }
@@ -261,7 +254,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
             return comparer;
         }
 
-        private CompareResultResponse GetCompareResultResponse(ChangeInfo[] changes, string resultGuid)
+        private static CompareResultResponse GetCompareResultResponse(ChangeInfo[] changes, string resultGuid)
         {
             CompareResultResponse compareResultResponse = new CompareResultResponse();
             compareResultResponse.SetChanges(changes);
@@ -292,6 +285,8 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
                 case ".txt":
                 case ".html":
                 case ".htm":
+                case ".jpg":
+                case ".jpeg":
                     return true;
                 default:
                     return false;

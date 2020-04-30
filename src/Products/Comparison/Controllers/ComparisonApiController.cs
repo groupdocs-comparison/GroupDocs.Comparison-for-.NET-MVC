@@ -1,4 +1,5 @@
-﻿using GroupDocs.Comparison.MVC.Products.Common.Entity.Web;
+﻿using GroupDocs.Comparison.Common.Exceptions;
+using GroupDocs.Comparison.MVC.Products.Common.Entity.Web;
 using GroupDocs.Comparison.MVC.Products.Common.Resources;
 using GroupDocs.Comparison.MVC.Products.Common.Util.LowercaseContractResolver;
 using GroupDocs.Comparison.MVC.Products.Comparison.Config;
@@ -197,24 +198,20 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Controllers
         {
             try
             {
-                LoadDocumentEntity document = comparisonService.LoadDocumentPages(loadResultPageRequest.guid,
+                LoadDocumentEntity document = ComparisonServiceImpl.LoadDocumentPages(loadResultPageRequest.guid,
                                                                                   loadResultPageRequest.password,
                                                                                   globalConfiguration.Comparison.GetPreloadResultPageCount() == 0);
                 return Request.CreateResponse(HttpStatusCode.OK, document);
             }
-            catch (System.Exception ex) {
-                FileLoadException passwordError = null;
-                if (ex.InnerException.ToString().Contains("Password"))
-                {
-                    passwordError = new FileLoadException("Invalid password");
-                }
+            catch (PasswordProtectedFileException ex)
+            {
                 // set exception message
-                if(passwordError != null)
-                {
-                    return Request.CreateResponse(HttpStatusCode.Forbidden, new Resources().GenerateException(passwordError, loadResultPageRequest.password));
-                } else {
-                    return Request.CreateResponse(HttpStatusCode.InternalServerError, new Resources().GenerateException(ex, loadResultPageRequest.password));
-                }
+                return Request.CreateResponse(HttpStatusCode.Forbidden, new Resources().GenerateException(ex, loadResultPageRequest.password));
+            }
+            catch (Exception ex)
+            {
+                // set exception message
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, new Resources().GenerateException(ex, loadResultPageRequest.password));
             }
         }
 

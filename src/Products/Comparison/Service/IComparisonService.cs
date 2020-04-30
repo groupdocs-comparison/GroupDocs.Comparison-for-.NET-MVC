@@ -7,7 +7,6 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
 {
     public interface IComparisonService
     {
-
         List<FileDescriptionEntity> LoadFiles(PostedDataEntity fileTreeRequest);
 
         /// <summary>
@@ -16,14 +15,6 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
         /// <param name="compareRequest">PostedDataEntity</param>
         /// <returns>CompareResultResponse</returns>
         CompareResultResponse Compare(CompareRequest compareRequest);
-
-        /// <summary>
-        ///  Load document pages as images
-        /// </summary>
-        /// <param name="path">string</param>
-        /// <param name="password">string</param>
-        /// <returns>LoadDocumentEntity</returns>
-        LoadDocumentEntity LoadDocumentPages(string path, string password, bool loadAllPages);
 
         /// <summary>
         ///  Load document page as images
@@ -37,6 +28,6 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
         /// </summary>
         /// <param name="file">CompareRequest</param>
         /// <returns>bool</returns>
-        bool CheckFiles(CompareRequest files);       
+        bool CheckFiles(CompareRequest files);
     }
 }
