@@ -23,7 +23,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
 
         public List<FileDescriptionEntity> LoadFiles(PostedDataEntity fileTreeRequest)
         {
-            // get request body       
+            // get request body
             string relDirPath = fileTreeRequest.path;
             // get file list from storage path
             try
@@ -115,12 +115,9 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
                 {
                     for (int i = 0; i < documentInfo.PageCount; i++)
                     {
-                        using (FileStream fileStream = File.Open(documentGuid, FileMode.Open, FileAccess.ReadWrite, FileShare.Read))
-                        {
-                            string encodedImage = GetPageData(i, password, fileStream);
+                        string encodedImage = GetPageData(i, documentGuid, password);
 
-                            pagesContent.Add(i, encodedImage);
-                        }
+                        pagesContent.Add(i, encodedImage);
                     }
                 }
 
@@ -128,8 +125,8 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
                 {
                     PageDescriptionEntity pageData = new PageDescriptionEntity
                     {
-                        height = 842,
-                        width = 595,
+                        height = documentInfo.PagesInfo[i].Height,
+                        width = documentInfo.PagesInfo[i].Width,
                         number = i + 1
                     };
 
@@ -156,13 +153,16 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
                 int pageNumber = postedData.page;
                 string password = (string.IsNullOrEmpty(postedData.password)) ? null : postedData.password;
 
-                using (FileStream fileStream = File.Open(documentGuid, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
+                using (Comparer comparer = new Comparer(documentGuid, GetLoadOptions(password)))
                 {
-                    loadedPage.SetData(GetPageData(pageNumber - 1, password, fileStream));
+                    IDocumentInfo info = comparer.Source.GetDocumentInfo();
 
+                    string encodedImage = GetPageData(pageNumber - 1, documentGuid, password);
+                    loadedPage.SetData(encodedImage);
+
+                    loadedPage.height = info.PagesInfo[pageNumber - 1].Height;
+                    loadedPage.width = info.PagesInfo[pageNumber - 1].Width;
                     loadedPage.number = pageNumber;
-                    loadedPage.height = 842;
-                    loadedPage.width = 595;
                 }
             }
             catch (Exception ex)
@@ -173,11 +173,11 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
             return loadedPage;
         }
 
-        private static string GetPageData(int pageNumber, string password, FileStream fileStream)
+        private static string GetPageData(int pageNumber, string documentGuid, string password)
         {
             string encodedImage = "";
 
-            using (Comparer comparer = new Comparer(fileStream, GetLoadOptions(password)))
+            using (Comparer comparer = new Comparer(documentGuid, GetLoadOptions(password)))
             {
                 byte[] bytes = RenderPageToMemoryStream(comparer, pageNumber).ToArray();
                 encodedImage = Convert.ToBase64String(bytes);
@@ -189,13 +189,14 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
         static MemoryStream RenderPageToMemoryStream(Comparer comparer, int pageNumberToRender)
         {
             MemoryStream result = new MemoryStream();
+            IDocumentInfo documentInfo = comparer.Source.GetDocumentInfo();
 
             PreviewOptions previewOptions = new PreviewOptions(pageNumber => result)
             {
                 PreviewFormat = PreviewFormats.PNG,
                 PageNumbers = new[] { pageNumberToRender + 1 },
-                Height = 842,
-                Width = 595
+                Height = documentInfo.PagesInfo[pageNumberToRender].Height,
+                Width = documentInfo.PagesInfo[pageNumberToRender].Width
             };
 
             comparer.Source.GeneratePreview(previewOptions);
@@ -218,7 +219,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
             // to get correct coordinates we will compare document twice
             // this is a first comparing to get correct coordinates of the insertions and style changes
             string extension = Path.GetExtension(compareRequest.guids[0].GetGuid());
-            string guid = System.Guid.NewGuid().ToString();
+            string guid = Guid.NewGuid().ToString();
             //save all results in file
             string resultGuid = Path.Combine(globalConfiguration.Comparison.GetResultDirectory(), guid + extension);
 
