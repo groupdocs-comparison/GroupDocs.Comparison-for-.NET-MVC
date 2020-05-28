@@ -2,14 +2,11 @@
 using GroupDocs.Comparison.MVC.Products.Comparison.Model.Request;
 using GroupDocs.Comparison.MVC.Products.Comparison.Model.Response;
 using System.Collections.Generic;
-using System.IO;
-using System.Web;
 
 namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
 {
     public interface IComparisonService
     {
-
         List<FileDescriptionEntity> LoadFiles(PostedDataEntity fileTreeRequest);
 
         /// <summary>
