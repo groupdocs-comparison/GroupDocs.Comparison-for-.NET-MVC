@@ -101,12 +101,4 @@ Please have a look at the LICENSE.md for more details
 - [Comapre documents](https://github.com/groupdocs-comparison/GroupDocs.Comparison-for-Java-Dropwizard) with JAVA Dropwizard 
 - [Comapre documents](https://github.com/groupdocs-comparison/GroupDocs.Comparison-for-.NET-WebForms) with .NET WebForms 
 
-## Resources
-- **Website:** [www.groupdocs.com](http://www.groupdocs.com)
-- **Product Home:** [GroupDocs.Comparison for .NET](https://products.groupdocs.com/Comparison/net)
-- **Product API References:** [GroupDocs.Comparison for .NET API](https://apireference.groupdocs.com)
-- **Download:** [Download GroupDocs.Comparison for .NET](https://downloads.groupdocs.com/Comparison/net)
-- **Documentation:** [GroupDocs.Comparison for .NET Documentation](https://docs.groupdocs.com/dashboard.action)
-- **Free Support Forum:** [GroupDocs.Comparison for .NET Free Support Forum](https://forum.groupdocs.com/c/Comparison)
-- **Paid Support Helpdesk:** [GroupDocs.Comparison for .NET Paid Support Helpdesk](https://helpdesk.groupdocs.com)
-- **Blog:** [GroupDocs.Comparison for .NET Blog](https://blog.groupdocs.com/category/groupdocs-Comparison-product-family)
+[Home](https://www.groupdocs.com/) | [Product Page](https://products.groupdocs.com/comparison/net) | [Documentation](https://docs.groupdocs.com/comparison/net/) | [Demo](https://products.groupdocs.app/comparison/family) | [API Reference](https://apireference.groupdocs.com/comparison/java) | [Examples](https://github.com/groupdocs-comparison/GroupDocs.Comparison-for-.NET/tree/master/Examples) | [Blog](https://blog.groupdocs.com/category/comparison/) | [Free Support](https://blog.groupdocs.com/category/comparison/) | [Temporary License](https://purchase.groupdocs.com/temporary-license)
