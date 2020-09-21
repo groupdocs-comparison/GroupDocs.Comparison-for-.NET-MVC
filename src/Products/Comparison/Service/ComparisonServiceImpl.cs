@@ -6,8 +6,9 @@ using GroupDocs.Comparison.MVC.Products.Comparison.Model.Response;
 using GroupDocs.Comparison.MVC.Products.Common.Config;
 using GroupDocs.Comparison.MVC.Products.Common.Util.Comparator;
 using GroupDocs.Comparison.MVC.Products.Comparison.Model.Request;
+using GroupDocs.Comparison.Result;
+using GroupDocs.Comparison.Interfaces;
 using GroupDocs.Comparison.Options;
-using GroupDocs.Comparison.Changes;
 
 namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
 {
@@ -22,7 +23,7 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
 
         public List<FileDescriptionEntity> LoadFiles(PostedDataEntity fileTreeRequest)
         {
-            // get request body       
+            // get request body
             string relDirPath = fileTreeRequest.path;
             // get file list from storage path
             try
@@ -46,16 +47,20 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
 
                 foreach (string file in allFiles)
                 {
-                    FileInfo fileInfo = new FileInfo(file);
+                    System.IO.FileInfo fileInfo = new System.IO.FileInfo(file);
                     // check if current file/folder is hidden
                     if (!(fileInfo.Attributes.HasFlag(FileAttributes.Hidden) ||
-                        Path.GetFileName(file).Equals(Path.GetFileName(globalConfiguration.Comparison.GetFilesDirectory()))))
+                        Path.GetFileName(file).StartsWith(".") ||
+                        Path.GetFileName(file).Equals(Path.GetFileName(globalConfiguration.Comparison.GetFilesDirectory())) ||
+                        Path.GetFileName(file).Equals(Path.GetFileName(globalConfiguration.Comparison.GetResultDirectory()))))
                     {
-                        FileDescriptionEntity fileDescription = new FileDescriptionEntity();
-                        fileDescription.guid = Path.GetFullPath(file);
-                        fileDescription.name = Path.GetFileName(file);
-                        // set is directory true/false
-                        fileDescription.isDirectory = fileInfo.Attributes.HasFlag(FileAttributes.Directory);
+                        FileDescriptionEntity fileDescription = new FileDescriptionEntity
+                        {
+                            guid = Path.GetFullPath(file),
+                            name = Path.GetFileName(file),
+                            // set is directory true/false
+                            isDirectory = fileInfo.Attributes.HasFlag(FileAttributes.Directory)
+                        };
                         // set file size
                         if (!fileDescription.isDirectory)
                         {
@@ -92,41 +97,48 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
         }
 
         public CompareResultResponse Compare(CompareRequest compareRequest)
-        {            
+        {
             CompareResultResponse compareResultResponse = CompareTwoDocuments(compareRequest);
             return compareResultResponse;
         }
 
-        public LoadDocumentEntity LoadDocumentPages(string path, string password)
+        public static LoadDocumentEntity LoadDocumentPages(string documentGuid, string password, bool loadAllPages)
         {
             LoadDocumentEntity loadDocumentEntity = new LoadDocumentEntity();
-            //load file with results
-            try
-            {
-                Comparer comparer = new Comparer();
-                List<PageImage> resultImages = comparer.ConvertToImages(path, password);
 
-                foreach (PageImage page in resultImages)
-                {
-                    PageDescriptionEntity loadedPage = new PageDescriptionEntity();
-                    byte[] bytes = null;
-                    page.PageStream.Position = 0;
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        page.PageStream.CopyTo(ms);
-                        bytes = ms.ToArray();
-                    }
-                    loadedPage.SetData(Convert.ToBase64String(bytes));
-                    loadedPage.height = page.Height;
-                    loadedPage.width = page.Width;
-                    loadedPage.number = page.PageNumber;
-                    loadDocumentEntity.SetPages(loadedPage);
-                }
-                return loadDocumentEntity;
-            }
-            catch (Exception ex)
+            using (Comparer comparer = new Comparer(documentGuid, GetLoadOptions(password)))
             {
-                throw new FileLoadException("Exception occurred while loading result pages", ex);
+                Dictionary<int, string> pagesContent = new Dictionary<int, string>();
+                IDocumentInfo documentInfo = comparer.Source.GetDocumentInfo();
+
+                if (loadAllPages)
+                {
+                    for (int i = 0; i < documentInfo.PageCount; i++)
+                    {
+                        string encodedImage = GetPageData(i, documentGuid, password);
+
+                        pagesContent.Add(i, encodedImage);
+                    }
+                }
+
+                for (int i = 0; i < documentInfo.PageCount; i++)
+                {
+                    PageDescriptionEntity pageData = new PageDescriptionEntity
+                    {
+                        height = documentInfo.PagesInfo[i].Height,
+                        width = documentInfo.PagesInfo[i].Width,
+                        number = i + 1
+                    };
+
+                    if (pagesContent.Count > 0)
+                    {
+                        pageData.SetData(pagesContent[i]);
+                    }
+
+                    loadDocumentEntity.SetPages(pageData);
+                }
+
+                return loadDocumentEntity;
             }
         }
 
@@ -134,134 +146,125 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
         {
             PageDescriptionEntity loadedPage = new PageDescriptionEntity();
 
-            string password = "";
             try
             {
                 // get/set parameters
                 string documentGuid = postedData.guid;
                 int pageNumber = postedData.page;
-                password = (String.IsNullOrEmpty(postedData.password)) ? null : postedData.password;
-                Comparer comparer = new Comparer();
-                List<PageImage> resultImages = comparer.ConvertToImages(documentGuid, password);
+                string password = (string.IsNullOrEmpty(postedData.password)) ? null : postedData.password;
 
-                byte[] bytes = null;
-                resultImages[pageNumber - 1].PageStream.Position = 0;
-                using (MemoryStream ms = new MemoryStream())
+                using (Comparer comparer = new Comparer(documentGuid, GetLoadOptions(password)))
                 {
-                    resultImages[pageNumber - 1].PageStream.CopyTo(ms);
-                    bytes = ms.ToArray();
-                }
-                loadedPage.SetData(Convert.ToBase64String(bytes));
-                loadedPage.number = pageNumber;
-                loadedPage.height = resultImages[pageNumber - 1].Height;
-                loadedPage.width = resultImages[pageNumber - 1].Width;
+                    IDocumentInfo info = comparer.Source.GetDocumentInfo();
 
+                    string encodedImage = GetPageData(pageNumber - 1, documentGuid, password);
+                    loadedPage.SetData(encodedImage);
+
+                    loadedPage.height = info.PagesInfo[pageNumber - 1].Height;
+                    loadedPage.width = info.PagesInfo[pageNumber - 1].Width;
+                    loadedPage.number = pageNumber;
+                }
             }
             catch (Exception ex)
             {
                 throw new FileLoadException("Exception occurred while loading result page", ex);
             }
+
             return loadedPage;
         }
 
-        public LoadDocumentEntity LoadDocumentInfo(PostedDataEntity postedData)
+        private static string GetPageData(int pageNumber, string documentGuid, string password)
         {
-            LoadDocumentEntity loadDocumentEntity = new LoadDocumentEntity();
+            string encodedImage = "";
 
-            string password = "";
-            try
+            using (Comparer comparer = new Comparer(documentGuid, GetLoadOptions(password)))
             {
-                // get/set parameters
-                string documentGuid = postedData.guid;
-                password = (String.IsNullOrEmpty(postedData.password)) ? null : postedData.password;
-                Comparer comparer = new Comparer();
-                List<PageImage> resultImages = comparer.ConvertToImages(documentGuid, password);
+                byte[] bytes = RenderPageToMemoryStream(comparer, pageNumber).ToArray();
+                encodedImage = Convert.ToBase64String(bytes);
+            }
 
-                foreach (PageImage page in resultImages)
-                {
-                    PageDescriptionEntity loadedPage = new PageDescriptionEntity();
-                    loadDocumentEntity.SetPages(loadedPage);
-                }
-                return loadDocumentEntity;
-            }
-            catch (Exception ex)
-            {
-                // set exception message
-                throw new FileLoadException("Exception occurred while loading document info", ex);
-            }
+            return encodedImage;
         }
 
+        static MemoryStream RenderPageToMemoryStream(Comparer comparer, int pageNumberToRender)
+        {
+            MemoryStream result = new MemoryStream();
+            IDocumentInfo documentInfo = comparer.Source.GetDocumentInfo();
 
+            PreviewOptions previewOptions = new PreviewOptions(pageNumber => result)
+            {
+                PreviewFormat = PreviewFormats.PNG,
+                PageNumbers = new[] { pageNumberToRender + 1 },
+                Height = documentInfo.PagesInfo[pageNumberToRender].Height,
+                Width = documentInfo.PagesInfo[pageNumberToRender].Width
+            };
+
+            comparer.Source.GeneratePreview(previewOptions);
+
+            return result;
+        }
+
+        private static LoadOptions GetLoadOptions(string password)
+        {
+            LoadOptions loadOptions = new LoadOptions
+            {
+                Password = password
+            };
+
+            return loadOptions;
+        }
 
         private CompareResultResponse CompareTwoDocuments(CompareRequest compareRequest)
         {
             // to get correct coordinates we will compare document twice
             // this is a first comparing to get correct coordinates of the insertions and style changes
-            ICompareResult compareResult = CompareFiles(compareRequest);
             string extension = Path.GetExtension(compareRequest.guids[0].GetGuid());
+            string guid = Guid.NewGuid().ToString();
+            //save all results in file
+            string resultGuid = Path.Combine(globalConfiguration.Comparison.GetResultDirectory(), guid + extension);
+
+            Comparer compareResult = CompareFiles(compareRequest, resultGuid);
             ChangeInfo[] changes = compareResult.GetChanges();
-            CompareResultResponse compareResultResponse = GetCompareResultResponse(compareResult, changes, extension);
+
+            CompareResultResponse compareResultResponse = GetCompareResultResponse(changes, resultGuid);
             compareResultResponse.SetExtension(extension);
             return compareResultResponse;
         }
 
-        private ICompareResult CompareFiles(CompareRequest compareRequest)
+        private static Comparer CompareFiles(CompareRequest compareRequest, string resultGuid)
         {
             string firstPath = compareRequest.guids[0].GetGuid();
-            ICompareResult compareResult;
+            string secondPath = compareRequest.guids[1].GetGuid();
+
             // create new comparer
-            Comparer comparer = new Comparer();
-            // create setting for comparing
-            ComparisonSettings settings = new ComparisonSettings();
-            settings.StyleChangeDetection = true;
-            settings.CalculateComponentCoordinates = true;
+            Comparer comparer = new Comparer(firstPath, GetLoadOptions(compareRequest.guids[0].GetPassword()));
 
-            compareResult = comparer.Compare(firstPath,
-                compareRequest.guids[0].GetPassword(),
-                compareRequest.guids[1].GetGuid(),
-                compareRequest.guids[1].GetPassword(),
-                settings);
+            comparer.Add(secondPath, GetLoadOptions(compareRequest.guids[1].GetPassword()));
+            CompareOptions compareOptions = new CompareOptions { CalculateCoordinates = true };
 
-            if (compareResult == null)
+            if (Path.GetExtension(resultGuid) == ".pdf")
             {
-                throw new InvalidOperationException("Something went wrong. We've got null result.");
+                compareOptions.DetalisationLevel = DetalisationLevel.High;
             }
-            return compareResult;
+
+            using (FileStream outputStream = File.Create(Path.Combine(resultGuid)))
+            {
+                comparer.Compare(outputStream, compareOptions);
+            }
+
+            return comparer;
         }
 
-        private CompareResultResponse GetCompareResultResponse(ICompareResult compareResult, ChangeInfo[] changes, string ext)
+        private static CompareResultResponse GetCompareResultResponse(ChangeInfo[] changes, string resultGuid)
         {
             CompareResultResponse compareResultResponse = new CompareResultResponse();
             compareResultResponse.SetChanges(changes);
 
-            string guid = System.Guid.NewGuid().ToString();
-            compareResultResponse.SetGuid(guid);
-            //save all results in file
-            string resultGuid = SaveFile(compareResultResponse.GetGuid(), compareResult.GetStream(), ext);
-            List<PageDescriptionEntity> pages = LoadDocumentPages(resultGuid, "").GetPages();
+            List<PageDescriptionEntity> pages = LoadDocumentPages(resultGuid, "", true).GetPages();
 
             compareResultResponse.SetPages(pages);
             compareResultResponse.SetGuid(resultGuid);
             return compareResultResponse;
-        }
-
-        private string SaveFile(string guid, Stream inputStream, string ext)
-        {
-            string fileName = Path.Combine(globalConfiguration.Comparison.GetResultDirectory(), guid + ext);
-            try
-            {
-                using (var fileStream = File.Create(fileName))
-                {
-                    inputStream.Seek(0, SeekOrigin.Begin);
-                    inputStream.CopyTo(fileStream);
-                    inputStream.Close();
-                }
-            }
-            catch (IOException)
-            {
-                throw new IOException("Exception occurred while write result images files.");
-            }
-            return fileName;
         }
 
         /// <summary>
@@ -283,6 +286,8 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
                 case ".txt":
                 case ".html":
                 case ".htm":
+                case ".jpg":
+                case ".jpeg":
                     return true;
                 default:
                     return false;

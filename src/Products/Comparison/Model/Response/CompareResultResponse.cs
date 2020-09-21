@@ -1,5 +1,5 @@
-﻿using GroupDocs.Comparison.Changes;
-using GroupDocs.Comparison.MVC.Products.Common.Entity.Web;
+﻿using GroupDocs.Comparison.MVC.Products.Common.Entity.Web;
+using GroupDocs.Comparison.Result;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
