@@ -110,6 +110,10 @@ namespace GroupDocs.Comparison.MVC.Products.Comparison.Service
             {
                 Dictionary<int, string> pagesContent = new Dictionary<int, string>();
                 IDocumentInfo documentInfo = comparer.Source.GetDocumentInfo();
+                if (documentInfo.PagesInfo == null) 
+                {
+                    throw new GroupDocs.Comparison.Common.Exceptions.ComparisonException("File is corrupted.");
+                }
 
                 if (loadAllPages)
                 {
