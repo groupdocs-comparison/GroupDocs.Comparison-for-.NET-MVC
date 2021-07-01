@@ -7,6 +7,8 @@ New GroupDocs.Comparison for .NET MVC UI Example
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b697a8607aac43d5a049697cb380b7b5)](https://www.codacy.com/app/GroupDocs/GroupDocs.Comparison-for-.NET-MVC?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=groupdocs-comparison/GroupDocs.Comparison-for-.NET-MVC&amp;utm_campaign=Badge_Grade)
 [![GitHub license](https://img.shields.io/github/license/groupdocs-comparison/GroupDocs.Comparison-for-.NET-MVC.svg)](https://github.com/groupdocs-comparison/GroupDocs.Comparison-for-.NET-MVC/blob/master/LICENSE)
 
+:warning: **This repository has moved to https://github.com/groupdocs-comparison/GroupDocs.Comparison-for-.NET/tree/master/Demos/MVC**
+
 ## System Requirements
 - .NET Framework 4.5
 - Visual Studio 2015
